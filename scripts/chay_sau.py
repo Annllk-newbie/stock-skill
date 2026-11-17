@@ -8,7 +8,7 @@ Cách dùng (phiên chính, sau khi đã có giá, trạng thái từ dự án v
 Với mỗi mã, ghi vào <out>/<MÃ>/: cycles.json, kiem_dinh_chu_ky.json (+ .txt), risk.json, indicators.json,
 kiem_dinh_su_kien.json (+ .txt; sự kiện = <MÃ>/su-kien.csv + luu-tru/su-kien-ma.csv + ngày đáo hạn VN30F sinh theo quy tắc); mã có biểu đồ thêm du_bao_6_phien.json, kiem_dinh_du_bao.json (+ .txt),
 <MÃ>-6-phien.png, bieu_do_6_phien.txt. Lịch sử dự báo (<du-an>/<MÃ>/du-bao-6-phien[-dieu-chinh].json) được ghi thêm tại chỗ.
-Toàn thị trường: <out>/ap_luc_von_ngoai.json và ap_luc.txt (nếu có <du-an>/data/von-ngoai.csv).
+Toàn thị trường: <out>/ap_luc_von_ngoai.json, ap_luc.txt, chuoi_truyen_dan.json và chuoi.txt (nếu có <du-an>/data/von-ngoai.csv).
 --nhe: bản giữa tuần – không chạy lại kiểm định chu kỳ và sự kiện (dùng kết quả lần trước nếu còn trên đĩa).
 
 In ra bản tóm tắt ngắn (cũng ghi <out>/tom_tat_script.md) và ghi <out>/moc_nhap.md: phần SỐ của data/MOC-THEO-DOI.md
@@ -220,6 +220,11 @@ def main():
         d1, e1 = chay([S("ap_luc_von_ngoai.py"), vn], os.path.join(a.out, "ap_luc_von_ngoai.json"))
         _, e2 = chay([S("ap_luc_von_ngoai.py"), vn, "--chu"], None, os.path.join(a.out, "ap_luc.txt"))
         L.append("## Dòng vốn ngoại\n- " + (f"LỖI {e1 or e2}" if (e1 or e2) else "xem ap_luc.txt và ap_luc_von_ngoai.json"))
+        vni = os.path.join(a.gia_dir, "gia_VNINDEX_ctck.csv")
+        cmd = [S("chuoi_truyen_dan.py"), vn] + (["--vnindex", vni] if os.path.isfile(vni) else [])
+        _, e3 = chay(cmd, os.path.join(a.out, "chuoi_truyen_dan.json"))
+        _, e4 = chay(cmd + ["--chu"], None, os.path.join(a.out, "chuoi.txt"))
+        L.append("## Chuỗi truyền dẫn\n- " + (f"LỖI {e3 or e4}" if (e3 or e4) else "xem chuoi.txt và chuoi_truyen_dan.json"))
 
     tt = "# Tóm tắt kết quả script\n\n" + "\n\n".join(L) + "\n"
     with open(os.path.join(a.out, "tom_tat_script.md"), "w", encoding="utf-8") as f:
@@ -227,7 +232,7 @@ def main():
     with open(os.path.join(a.out, "moc_nhap.md"), "w", encoding="utf-8") as f:
         f.write("# Mốc theo dõi – trạng thái từ phân tích sâu gần nhất\n\nNgày phân tích: (điền) · dữ liệu đến phiên: (điền)\n\n"
                 + "\n\n".join(moc)
-                + "\n\n### Toàn thị trường\n- Điểm áp lực khối ngoại: (điền từ ap_luc.txt)\n- Lịch sự kiện 10 ngày tới: (điền từ báo cáo)\n")
+                + "\n\n### Toàn thị trường\n- Điểm áp lực khối ngoại: (điền từ ap_luc.txt)\n- Chuỗi truyền dẫn: (điền 1–2 câu từ mục Chuỗi truyền dẫn của báo cáo: cú sốc đang theo dõi, chỗ đứt, điều làm cách đọc này sai)\n- Lịch sự kiện 10 ngày tới: (điền từ báo cáo)\n")
     print(tt)
 
 

@@ -2,7 +2,7 @@
 
 Phiên chính đọc file này và PHẦN 1 của `thu-thap.md`. Không đọc file tham chiếu nào khác.
 
-Mục tiêu: đọc xong trong **3 phút trên điện thoại** (thân bản tin **tối đa khoảng 350 từ**, không tính ảnh). Chỉ cung cấp thông tin: không phân tích lại nguyên nhân, không chạy lại kiểm định, không gọi Opus, không đọc vault, không đọc bản tin hay báo cáo cũ. Thứ gì cần lưu để kiểm tra nhưng không cần đọc hằng ngày thì vào **phụ lục**.
+Mục tiêu: đọc xong trong **3 phút trên điện thoại** (thân bản tin **tối đa khoảng 380 từ**, không tính ảnh). Chỉ cung cấp thông tin: không phân tích lại nguyên nhân, không chạy lại kiểm định, không gọi Opus, không đọc vault, không đọc bản tin hay báo cáo cũ. Thứ gì cần lưu để kiểm tra nhưng không cần đọc hằng ngày thì vào **phụ lục**.
 
 ## Quy trình
 
@@ -14,9 +14,9 @@ Mục tiêu: đọc xong trong **3 phút trên điện thoại** (thân bản ti
    - Gọi **agent T (Haiku, effort low) tải trạng thái** với đúng lời giao việc ở mục "Agent T" dưới đây. Không tự gọi `project_read` trong phiên chính (nội dung file sẽ nằm lại trong ngữ cảnh suốt lần chạy).
 2. Đọc từ đĩa: `<W>/du-an/data/TOM-TAT.md` và `<W>/du-an/data/MOC-THEO-DOI.md` (mốc theo dõi, lịch sự kiện, vị trí chu kỳ và kết quả kiểm định từ phân tích sâu gần nhất). Không đọc các CSV: xử lý chúng bằng Python, chỉ in vài dòng.
 3. Gọi song song **B1, B2, B3** (Haiku, effort medium). Lời giao việc ngắn, theo đầu file `thu-thap.md` (tên agent, câu "đọc thu-thap.md PHẦN 1 và 2", tham số). Không chép quy tắc vào lời giao việc.
-4. So hai nguồn của từng số theo "Quy tắc chính xác", gắn nhãn. Chỉ khi còn số quan trọng chưa ✔ mới gọi A5 (tối đa 10 dòng). Ghi thêm dòng vào `kiem-chung.csv`, `von-ngoai.csv`, `su-kien-nen-tang.csv`, `tham-chieu.csv` trong `<W>/du-an/` bằng Python (chỉ thêm dòng), rồi chạy `ap_luc_von_ngoai.py <W>/du-an/data/von-ngoai.csv --chu > <W>/ap_luc.txt`. Giá đóng cửa chưa ✔ là dòng tạm: không dùng để chấm mốc hay vẽ vùng dự báo.
+4. So hai nguồn của từng số theo "Quy tắc chính xác", gắn nhãn. Chỉ khi còn số quan trọng chưa ✔ mới gọi A5 (tối đa 10 dòng). Ghi thêm dòng vào `kiem-chung.csv`, `von-ngoai.csv`, `su-kien-nen-tang.csv`, `tham-chieu.csv` trong `<W>/du-an/` bằng Python (chỉ thêm dòng), rồi chạy `ap_luc_von_ngoai.py <W>/du-an/data/von-ngoai.csv --chu > <W>/ap_luc.txt` và `chuoi_truyen_dan.py <W>/du-an/data/von-ngoai.csv --vnindex <W>/gia/gia_VNINDEX_ctck.csv --chu > <W>/chuoi.txt` (file `von-ngoai.csv` chưa có cột `vix` thì chạy `chuoi_truyen_dan.py <file> --them-cot` một lần trước khi thêm dòng). Giá đóng cửa chưa ✔ là dòng tạm: không dùng để chấm mốc hay vẽ vùng dự báo.
 5. MBB và TCB: `forecast6.py <giá> --lich-su <file dự báo của mã> --khong-kiem-chung --he-so <he_so_gian_vung phiên 6 của dự báo gần nhất trong file đó>` rồi `chart6.py <giá> --ma <MÃ> --du-bao <kết quả> --out <W>/<MÃ>-6-phien.png > <W>/<MÃ>-6-phien.txt`. File dự báo: MBB `du-an/MBB/du-bao-6-phien.json`, TCB `du-an/TCB/du-bao-6-phien-dieu-chinh.json` (TCB đã chia cổ tức cổ phiếu 100:50, GDKHQ 29/10/2026; giá từ API đã điều chỉnh). CTG, HPG chỉ cần giá so với TB20, tính từ file giá. Không chạy `cycles.py`: vị trí chu kỳ = vị trí trong `MOC-THEO-DOI.md` cộng số phiên đã qua.
-6. Viết **thân bản tin** theo mẫu vào `<W>/ban_tin.md`. **Phụ lục ghép bằng một lệnh** vào `<W>/phu_luc.md` (`cat` các file đã có dưới đúng tiêu đề của mẫu: bản chữ `chart6.py`, `ap_luc.txt`, file kết quả, `danh_muc_*.md`, `nguon_*.md` của B1–B3); phiên chính chỉ tự viết ba mục ngắn "Chưa kiểm chứng", "Đã thu thập nhưng không dùng", "Độ chính xác dự báo".
+6. Viết **thân bản tin** theo mẫu vào `<W>/ban_tin.md`. **Phụ lục ghép bằng một lệnh** vào `<W>/phu_luc.md` (`cat` các file đã có dưới đúng tiêu đề của mẫu: bản chữ `chart6.py`, `ap_luc.txt`, `chuoi.txt`, file kết quả, `danh_muc_*.md`, `nguon_*.md` của B1–B3); phiên chính chỉ tự viết ba mục ngắn "Chưa kiểm chứng", "Đã thu thập nhưng không dùng", "Độ chính xác dự báo".
 7. **Lưu** (mục "Lưu" dưới đây), rồi trả lời.
 
 ## Agent T – tải trạng thái (lời giao việc, chép nguyên văn, thay `<S>`, `<W>`)
@@ -46,6 +46,7 @@ Agent T báo lỗi, không có công cụ Projects, hoặc `da_luu` rỗng: phi�
 ## Quy tắc lọc cho thân bản tin
 - Chỉ đưa vào điều **khác hôm qua** hoặc **cần chú ý hôm nay**: mốc bị chạm, giá ra ngoài vùng 80%, khối lượng ≥ 1,5 lần TB20, giá thay đổi ≥ 2 lần độ lệch chuẩn ngày, tin T1 của mã theo dõi, tin nền tảng làm đổi điểm áp lực khối ngoại, sự kiện trong 3 phiên tới. Còn lại để phụ lục.
 - Chỉ dùng số ✔, không gắn nhãn từng số (dòng đầu đã ghi tổng). Số ◐ ghi "[mục] chưa xác nhận"; số ✖ ghi "[mục]: các nguồn mâu thuẫn". Giá đóng cửa của một mã chưa ✔ thì dòng mã đó ghi "giá chưa xác nhận" và bỏ vùng dự báo, mốc.
+- **Chuỗi truyền dẫn** (một dòng, tối đa 40 từ, chép từ phần "Đọc chuỗi" của `chuoi.txt`, không tự suy luận thêm): mắt xích quốc tế nào ĐÁNG KỂ và chiều của nó → đã truyền tới đâu → chỗ đứt đầu tiên. Không mắt xích quốc tế nào vượt ngưỡng thì ghi đúng "Chuỗi truyền dẫn: không có cú sốc mới"; script ghi "chưa đủ số quốc tế" thì ghi đúng "Chuỗi truyền dẫn: chưa đủ số liệu". Mắt xích mang số ◐ thì thêm "chưa xác nhận"; mắt xích script ghi "chưa có số liệu" hay "số cũ" thì không dùng. Không viết lý do của chỗ đứt (việc của phân tích sâu), trừ khi `MOC-THEO-DOI.md` đã ghi sẵn. Chỗ đứt mới so với dòng "Chuỗi truyền dẫn" trong `MOC-THEO-DOI.md` thì đưa lên "Đáng chú ý hôm nay".
 - Chu kỳ chỉ nêu khi `MOC-THEO-DOI.md` ghi kiểm định của mã là `co_co_so` hoặc `goi_y_yeu`; `khong_khac_ngau_nhien` thì ghi "chu kỳ: không khác ngẫu nhiên"; chưa có kết quả kiểm định thì ghi "chu kỳ: chưa kiểm định".
 - Độ chính xác dự báo chỉ nêu khi đã có ≥ 10 dự báo độc lập; chưa đủ thì bỏ hẳn.
 - Không bảng, không biểu đồ chữ, không lặp số đã có trong ảnh `chart6.py`.
@@ -59,6 +60,7 @@ Agent T báo lỗi, không có công cụ Projects, hoặc `da_luu` rỗng: phi�
 - Việt Nam: VN-Index [điểm, %], thanh khoản [so với TB20], khối ngoại HOSE [ròng], tự doanh [ròng].
 - Thế giới đêm qua: chỉ nêu biến động đáng kể (S&P 500/Nasdaq ≥ 1%, lợi suất Mỹ 10 năm ≥ 5 điểm cơ bản, DXY ≥ 0,5%, dầu ≥ 2%, châu Á ≥ 1,5%); không có thì ghi "yên ắng".
 - Khối ngoại toàn thị trường: điểm áp lực [x/100, mức], đổi [±] so với hôm qua vì [chỉ báo chính] (thêm "chưa kiểm chứng" khi chưa đủ 40 phiên).
+- Chuỗi truyền dẫn: [mắt xích quốc tế đáng kể ↑/↓] → [đã truyền tới] · đứt ở [mắt xích] (hoặc "không có cú sốc mới").
 ## Từng mã (mỗi mã 1 dòng, thêm dòng thứ 2 chỉ khi có tin T1 hoặc mốc bị chạm)
 - MBB [giá] ([%], KL [x]×TB20) · vùng 80% phiên 6: [a–b] · [trong/ngoài vùng hôm qua] · chu kỳ: [pha, phiên thứ n] · mốc: [chưa chạm / đã chạm …]
 - CTG [giá] ([%], KL [x]×TB20) · [trên/dưới] TB20 · chu kỳ: […]
@@ -76,6 +78,7 @@ Agent T báo lỗi, không có công cụ Projects, hoặc `da_luu` rỗng: phi�
 ## Kỹ thuật MBB, TCB (bản chữ chart6.py) và giá so với TB20 của các mã khác
 ## Thế giới đêm qua – đầy đủ
 ## Dòng vốn ngoại – bản chữ ap_luc_von_ngoai.py
+## Chuỗi truyền dẫn – bản chữ chuoi_truyen_dan.py
 ## Tin nền tảng mới (mỗi tin một dòng kèm chuỗi tác động)
 ## Tin doanh nghiệp không đưa lên thân bản tin
 ## Doanh nghiệp và ngành tham chiếu – đầy đủ (B3)

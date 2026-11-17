@@ -107,7 +107,11 @@ def nen_file(goc, rel, so_ngay, hom_nay):
         luu = os.path.join(goc, luu_rel)
         old = []
         if os.path.exists(luu):
-            _, old = doc(luu)
+            h_cu, old = doc(luu)
+            if h_cu and h_cu != header:
+                # nhật ký được thêm cột (vd. vix, vang): xếp lại dòng lưu trữ cũ theo tên cột mới, cột thiếu để trống
+                vt = {c: k for k, c in enumerate(h_cu)}
+                old = [[(r[vt[c]] if c in vt and vt[c] < len(r) else "") for c in header] for r in old]
         seen = {tuple(x) for x in old}
         ghi(luu, header, old + [r for _, r in sorted(cu, key=lambda x: x[0]) if tuple(r) not in seen])
         ghi_luu.append(luu_rel)

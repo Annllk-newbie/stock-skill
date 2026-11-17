@@ -49,6 +49,7 @@ Có `loi`: không dùng phiên đó cho dự báo, ghi ở mục "Dữ liệu". 
 **Dòng vốn ngoại (cấp toàn thị trường, không dự đoán bán tháo từng mã):**
 - `data/von-ngoai.csv`: mỗi lần chạy thêm một dòng cho mỗi phiên còn thiếu, đúng cột ghi ở đầu `ap_luc_von_ngoai.py`. Chỉ ghi số ✔; số ◐ ghi kèm nhãn trong cột `nguon`; số ✖ để trống. Ô không lấy được để trống, không chép số cũ sang ngày mới. Số theo tuần (ETF, khu vực) ghi ở ngày công bố. Không sửa số đã có trừ khi có nguồn đính chính (ghi lý do vào `nguon`). Mỗi lần chạy lấy bù khoảng 1 tuần số cũ của DXY, lợi suất Mỹ 10 năm, giá USD Vietcombank và khối ngoại HOSE cho đến khi file đủ 8 tuần.
 - `python scripts/ap_luc_von_ngoai.py von-ngoai.csv --chu` cho điểm áp lực bán 0–100 (THẤP dưới 45, VỪA 45–64, CAO từ 65) và chỉ báo đang đẩy/kéo. Trước khi đủ 40 phiên có số khối ngoại, luôn ghi "điểm theo lý thuyết, chưa kiểm chứng". Khi script đã tự kiểm chứng, dẫn kết quả đó; chỉ báo bị chấm "không thấy tác dụng" hay "ngược chiều" thì nói rõ và không dùng để giải thích.
+- **Chuỗi truyền dẫn** dùng chung `data/von-ngoai.csv`, thêm ba cột `lam_phat_ky_vong_5y` (breakeven Mỹ 5 năm, FRED chuỗi `T5YIE`), `vix`, `vang` (cùng quy tắc ghi như các cột khác; file cũ chưa có cột thì chạy `chuoi_truyen_dan.py <file> --them-cot` một lần). `python scripts/chuoi_truyen_dan.py von-ngoai.csv --vnindex gia_VNINDEX_ctck.csv --chu` in từng mắt xích (số, thay đổi, ĐÁNG KỂ/yên) và phần "Đọc chuỗi" (đã truyền, chỗ đứt). Đây là quan sát cơ học: không dùng để kết luận nguyên nhân hay dự báo hướng.
 - Tin nền tảng: `su-kien-nen-tang.csv` (cột `date,nhom,su_kien,tac_dong_du_kien,source_url,reliability,note`; `nhom` là F1–F7); `tac_dong_du_kien` là chuỗi nhân quả ngắn ở cấp thị trường. Chỉ thêm dòng mới.
 
 ## PHẦN 2 – Việc của agent thu thập (Haiku, effort medium)
@@ -74,7 +75,7 @@ Có `loi`: không dùng phiên đó cho dự báo, ghi ở mục "Dữ liệu". 
 | T1 | Tin doanh nghiệp từng mã (KQKD, cổ tức, ĐHCĐ, phát hành, giao dịch cổ đông lớn/nội bộ) | trang ưu tiên → hsx.vn, vsd.vn |
 | T2 | Ngành: ngân hàng (lãi suất, tín dụng, NHNN), thép (giá thép, quặng sắt, Trung Quốc), chứng khoán (thanh khoản, margin, ETF) | trang ưu tiên |
 | V1 | Vĩ mô Việt Nam: tỷ giá USD/VND, lãi suất liên ngân hàng, chính sách NHNN | sbv.gov.vn → báo tài chính |
-| V2 | Quốc tế đêm qua: Dow Jones, S&P 500, Nasdaq, Nikkei, Hang Seng, Shanghai, Kospi, lợi suất Mỹ 2 và 10 năm, DXY, Brent, VIX | AP / Reuters / CNBC / MarketWatch; Nikkei Asia, Yonhap, SCMP → Investing.com |
+| V2 | Quốc tế đêm qua: Dow Jones, S&P 500, Nasdaq, Nikkei, Hang Seng, Shanghai, Kospi, lợi suất Mỹ 2 và 10 năm, DXY, Brent (kèm MỘT câu nguyên nhân bài báo nêu nếu Brent đổi ≥ 2%: nguồn cung / nhu cầu / không nêu), VIX, vàng, breakeven Mỹ 5 năm | AP / Reuters / CNBC / MarketWatch; Nikkei Asia, Yonhap, SCMP → Investing.com; vàng: kitco.com; breakeven: fred.stlouisfed.org chuỗi `T5YIE` (cấp 1, chậm một ngày) |
 | L1 | Lịch sự kiện 10 ngày tới: GDKHQ, công bố KQKD, đáo hạn phái sinh, cơ cấu ETF, FOMC, số liệu vĩ mô | Tin nhanh chứng khoán, vsd.vn, federalreserve.gov |
 | F1 | Fed và Mỹ: quyết định gần nhất, số phiếu, xác suất cho kỳ họp tới, lợi suất 2 và 10 năm, DXY, lịch CPI/PCE/việc làm/biên bản FOMC | xem "Nguồn Fed" |
 | F2 | NHNN: lãi suất điều hành, văn bản mới, OMO và tín phiếu (bơm/hút ròng), tỷ giá trung tâm, giá USD Vietcombank và tự do, liên ngân hàng qua đêm, chỉ tiêu tín dụng | sbv.gov.vn → thitruongtaichinhtiente.vn, thoibaonganhang.vn |
@@ -86,7 +87,7 @@ Có `loi`: không dùng phiên đó cho dự báo, ghi ở mục "Dữ liệu". 
 
 **Bản tin sáng – ba agent chạy song song** (chỉ thứ đổi theo ngày):
 - **B1 – dòng tiền Việt Nam:** G2 (chỉ tìm một bài xác nhận số `chi_so` được đưa), G3, và các cột hằng ngày của `von-ngoai.csv`: tỷ giá trung tâm, giá bán USD Vietcombank, giá USD tự do, liên ngân hàng qua đêm, OMO bơm/hút ròng. G1 chỉ cho mã chưa ✔ (mã ◐: thêm một nguồn; mã ✖/⊘: hai nguồn); mọi mã đã ✔ thì không tìm giá cổ phiếu.
-- **B2 – tin và quốc tế:** T1 (chỉ tin đăng sau lần chạy trước), V2 rút gọn (S&P 500, Nasdaq, Nikkei, Hang Seng, Shanghai, lợi suất Mỹ 10 năm, DXY, Brent), L1 cho 3 phiên tới (chỉ tìm sự kiện mới công bố so với lịch đã có), và đúng sự kiện F1/F2 nằm trong lịch 24 giờ qua nếu phiên chính nêu.
+- **B2 – tin và quốc tế:** T1 (chỉ tin đăng sau lần chạy trước), V2 rút gọn (S&P 500, Nasdaq, Nikkei, Hang Seng, Shanghai, lợi suất Mỹ 2 và 10 năm, DXY, Brent kèm nguyên nhân, VIX, vàng, breakeven Mỹ 5 năm; bốn số sau cùng không tìm được sau một lần tìm thì ghi ⊘, không tìm tiếp), L1 cho 3 phiên tới (chỉ tìm sự kiện mới công bố so với lịch đã có), và đúng sự kiện F1/F2 nằm trong lịch 24 giờ qua nếu phiên chính nêu.
 - **B3 – doanh nghiệp và ngành tham chiếu:** theo mục 1.3 của SKILL.md, tối đa 8 tin, chỉ tin mới; mỗi tin: ngày · doanh nghiệp/ngành · tin (1 câu) · kênh ảnh hưởng tới mã nào hoặc toàn thị trường · nhãn · nguồn; ghi thành các dòng CSV đúng cột của `tham-chieu.csv`.
 T2, F3–F7, phần chính sách của F2 và phần xác suất/lịch của F1 chỉ thu thập ở phân tích sâu.
 

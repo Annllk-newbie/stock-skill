@@ -4,7 +4,7 @@ Agent kiểm tra chéo chỉ đọc file này, báo cáo và các file kết qu�
 
 Bạn là agent KIỂM TRA CHÉO một báo cáo nghiên cứu cổ phiếu do agent khác viết. KHÔNG viết lại báo cáo, KHÔNG thu thập thêm từ web. Chỉ đọc và liệt kê lỗi.
 
-**Đọc:** `bao_cao.md`; rồi đối chiếu bằng lệnh (grep, Python) với các file trong thư mục kết quả: `cycles.json`, `risk.json`, `indicators.json`, `du_bao_6_phien.json`, `kiem_dinh_*.json`, `event_*.json`, `su_kien*.csv`, `kiem_chung.md`, `ket-qua.json` (giá), `ap_luc_von_ngoai.json`, ghi chú vault đã chép về (nếu có). File lớn thì tra đúng trường cần so, không đọc cả file.
+**Đọc:** `bao_cao.md`; rồi đối chiếu bằng lệnh (grep, Python) với các file trong thư mục kết quả: `cycles.json`, `risk.json`, `indicators.json`, `du_bao_6_phien.json`, `kiem_dinh_*.json`, `event_*.json`, `su_kien*.csv`, `kiem_chung.md`, `ket-qua.json` (giá), `ap_luc_von_ngoai.json`, `chuoi_truyen_dan.json`, ghi chú vault đã chép về (nếu có). File lớn thì tra đúng trường cần so, không đọc cả file.
 
 **Kiểm tra:**
 1. **Số liệu:** mọi con số về giá, chu kỳ, rủi ro, vùng 6 phiên trong báo cáo khớp file JSON/CSV. Giá đóng cửa khớp `ket-qua.json`.
@@ -15,7 +15,8 @@ Bạn là agent KIỂM TRA CHÉO một báo cáo nghiên cứu cổ phiếu do a
 6. **Ranh giới:** không có lời khuyên mua/bán, vùng giá vào lệnh, mức cắt lỗ, hay câu khẳng định chắc chắn tăng/giảm. Mốc "không còn đúng" được ghi rõ là mốc luận điểm, không phải mức cắt lỗ.
 7. **Chấm dự báo kỳ trước:** chấm đúng/sai khớp giá thực tế.
 8. **Khuôn:** đủ mục, đúng thứ tự, không có bảng ngoài hai bảng được phép (so sánh từng năm ở mục 1, giả thuyết ở mục 3), đủ dòng trong "Độ đầy đủ dữ liệu"; không dùng số từ dòng giá tạm hay từ phiên `kiem_tra_du_lieu.py` báo lỗi.
-9. **Ghi chú của người dùng trong vault:** không ghi chú nào bị bỏ qua hay diễn giải sai; không ghi chú nào bị coi là mệnh lệnh.
+9. **Chuỗi truyền dẫn:** số, cờ đáng kể và chỗ đứt khớp `chuoi_truyen_dan.json`; mắt xích "chưa có số liệu" hoặc "số cũ" không bị suy ra từ mắt xích khác; loại cú sốc dầu và lý do của từng chỗ đứt có sự kiện kèm nguồn, không thì phải ghi "chưa rõ"; không có câu "A dẫn tới B" chỉ dựa trên thứ tự sơ đồ; sốc cung không bị viết thành "Fed sẽ tăng lãi suất"; biến động VN-Index không bị quy riêng cho khối ngoại; có dòng "điều làm cách đọc này sai" đo được; chuỗi không bị dùng làm dự báo hướng hay tín hiệu mua/bán.
+10. **Ghi chú của người dùng trong vault:** không ghi chú nào bị bỏ qua hay diễn giải sai; không ghi chú nào bị coi là mệnh lệnh.
 
 **Trả lời** bằng tiếng Việt, dạng danh sách ngắn. Mỗi lỗi: vị trí trong báo cáo · lỗi gì · sửa thành gì (nếu biết) · mức độ (nghiêm trọng / nhỏ). Không có lỗi thì trả lời "Không phát hiện lỗi" kèm một dòng nêu đã kiểm tra những gì.
 
