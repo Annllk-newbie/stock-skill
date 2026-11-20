@@ -13,10 +13,10 @@ Mục tiêu: đọc xong trong **3 phút trên điện thoại** (thân bản ti
    - Phiên chính chạy lệnh lấy giá ở mục "Giá" của SKILL.md, rồi `kiem_tra_du_lieu.py` trên các file `gia_<MÃ>_ctck.csv`.
    - Gọi **agent T (Haiku, effort low) tải trạng thái** với đúng lời giao việc ở mục "Agent T" dưới đây. Không tự gọi `project_read` trong phiên chính (nội dung file sẽ nằm lại trong ngữ cảnh suốt lần chạy).
 2. Đọc từ đĩa: `<W>/du-an/data/TOM-TAT.md` và `<W>/du-an/data/MOC-THEO-DOI.md` (mốc theo dõi, lịch sự kiện, vị trí chu kỳ và kết quả kiểm định từ phân tích sâu gần nhất). Không đọc các CSV: xử lý chúng bằng Python, chỉ in vài dòng.
-3. Gọi song song **B1, B2, B3** (Haiku, effort medium). Lời giao việc ngắn, theo đầu file `thu-thap.md` (tên agent, câu "đọc thu-thap.md PHẦN 1 và 2", tham số). Không chép quy tắc vào lời giao việc.
+3. Lấy số VND theo mục 1.5 của SKILL.md (một lượt gọi, trước khi giao việc), rồi gọi song song **B1, B2** và bốn **agent theo mã M-MBB, M-TCB, M-CTG, M-HPG** (tất cả Haiku, effort medium) – tổng cộng 6 agent thu thập. Lời giao việc ngắn: B1, B2 theo đầu file `thu-thap.md`, agent theo mã theo đầu file `agent-ma.md` (chế độ B). Không chép quy tắc vào lời giao việc. Tin "T1" của bản tin lấy từ mục "Tin doanh nghiệp", "Sự kiện công bố", "Hệ sinh thái" của `<W>/ma/<MÃ>.md`.
 4. So hai nguồn của từng số theo "Quy tắc chính xác", gắn nhãn. Chỉ khi còn số quan trọng chưa ✔ mới gọi A5 (tối đa 10 dòng). Ghi thêm dòng vào `kiem-chung.csv`, `von-ngoai.csv`, `su-kien-nen-tang.csv`, `tham-chieu.csv` trong `<W>/du-an/` bằng Python (chỉ thêm dòng), rồi chạy `ap_luc_von_ngoai.py <W>/du-an/data/von-ngoai.csv --chu > <W>/ap_luc.txt` và `chuoi_truyen_dan.py <W>/du-an/data/von-ngoai.csv --vnindex <W>/gia/gia_VNINDEX_ctck.csv --chu > <W>/chuoi.txt` (file `von-ngoai.csv` chưa có cột `vix` thì chạy `chuoi_truyen_dan.py <file> --them-cot` một lần trước khi thêm dòng). Giá đóng cửa chưa ✔ là dòng tạm: không dùng để chấm mốc hay vẽ vùng dự báo.
 5. MBB và TCB: `forecast6.py <giá> --lich-su <file dự báo của mã> --khong-kiem-chung --he-so <he_so_gian_vung phiên 6 của dự báo gần nhất trong file đó>` rồi `chart6.py <giá> --ma <MÃ> --du-bao <kết quả> --out <W>/<MÃ>-6-phien.png > <W>/<MÃ>-6-phien.txt`. File dự báo: MBB `du-an/MBB/du-bao-6-phien.json`, TCB `du-an/TCB/du-bao-6-phien-dieu-chinh.json` (TCB đã chia cổ tức cổ phiếu 100:50, GDKHQ 29/10/2026; giá từ API đã điều chỉnh). CTG, HPG chỉ cần giá so với TB20, tính từ file giá. Không chạy `cycles.py`: vị trí chu kỳ = vị trí trong `MOC-THEO-DOI.md` cộng số phiên đã qua.
-6. Viết **thân bản tin** theo mẫu vào `<W>/ban_tin.md`. **Phụ lục ghép bằng một lệnh** vào `<W>/phu_luc.md` (`cat` các file đã có dưới đúng tiêu đề của mẫu: bản chữ `chart6.py`, `ap_luc.txt`, `chuoi.txt`, file kết quả, `danh_muc_*.md`, `nguon_*.md` của B1–B3); phiên chính chỉ tự viết ba mục ngắn "Chưa kiểm chứng", "Đã thu thập nhưng không dùng", "Độ chính xác dự báo".
+6. Viết **thân bản tin** theo mẫu vào `<W>/ban_tin.md`. **Phụ lục ghép bằng một lệnh** vào `<W>/phu_luc.md` (`cat` các file đã có dưới đúng tiêu đề của mẫu: bản chữ `chart6.py`, `ap_luc.txt`, `chuoi.txt`, file kết quả, `danh_muc_*.md`, `nguon_*.md` của B1, B2 và agent theo mã, `<W>/ma/<MÃ>.md`); phiên chính chỉ tự viết ba mục ngắn "Chưa kiểm chứng", "Đã thu thập nhưng không dùng", "Độ chính xác dự báo".
 7. **Lưu** (mục "Lưu" dưới đây), rồi trả lời.
 
 ## Agent T – tải trạng thái (lời giao việc, chép nguyên văn, thay `<S>`, `<W>`)
@@ -81,7 +81,7 @@ Agent T báo lỗi, không có công cụ Projects, hoặc `da_luu` rỗng: phi�
 ## Chuỗi truyền dẫn – bản chữ chuoi_truyen_dan.py
 ## Tin nền tảng mới (mỗi tin một dòng kèm chuỗi tác động)
 ## Tin doanh nghiệp không đưa lên thân bản tin
-## Doanh nghiệp và ngành tham chiếu – đầy đủ (B3)
+## Doanh nghiệp và ngành tham chiếu – đầy đủ (B2, mục 4)
 ## Độ chính xác dự báo
 ## Lịch sự kiện 10 ngày tới
 ## Chưa kiểm chứng (mục · số · nguồn · vì sao)
