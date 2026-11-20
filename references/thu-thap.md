@@ -63,7 +63,7 @@ Có `loi`: không dùng phiên đó cho dự báo, ghi ở mục "Dữ liệu". 
 - Ghi kết quả vào thư mục phiên chính chỉ định: file kết quả của mình, `danh_muc_<tên agent>.md` (mỗi mục của mình: **có / không có tin mới / không lấy được – lý do** · nguồn 1 · nguồn 2), `nguon_<tên agent>.md` (link đã đọc kèm cấp nguồn, link không đọc được kèm lý do). Mục không lấy được vẫn ghi dòng; không bỏ dòng.
 - Trả lời cuối thật ngắn: đã ghi file nào, bao nhiêu dòng, mục nào thiếu. Không chép nội dung file vào câu trả lời.
 
-**Tham số phiên chính phải đưa:** tên agent · phiên cần lấy (ngày) và ngày của lần chạy trước · `<DANH_SÁCH_MÃ>` · mã nào chưa ✔ giá (hoặc "mọi mã đã ✔") · số `chi_so` cần xác nhận (B1/A1) · thư mục ghi kết quả · đường dẫn `TOM-TAT.md` trên đĩa (để không tìm lại tin đã có) · sự kiện trong lịch L1 rơi vào 24 giờ qua (nếu có).
+**Tham số phiên chính phải đưa:** tên agent · phiên cần lấy (ngày) và ngày của lần chạy trước · `<DANH_SÁCH_MÃ>` · mã nào chưa ✔ giá (hoặc "mọi mã đã ✔") · "VND lỗi" hoặc mã VND chưa xác nhận (nếu có) · Brent và % thay đổi từ VND (B2) · thư mục ghi kết quả · đường dẫn `TOM-TAT.md` trên đĩa (để không tìm lại tin đã có) · sự kiện trong lịch L1 rơi vào 24 giờ qua (nếu có).
 
 **Danh mục thu thập cố định**
 
@@ -85,18 +85,17 @@ Có `loi`: không dùng phiên đó cho dự báo, ghi ở mục "Dữ liệu". 
 | F6 | ETF và chỉ số: dòng tiền tuần các ETF vào Việt Nam, lịch xem xét FTSE/MSCI/VN30/VNDiamond | VnEconomy (bài ETF tuần), index.vn, The Investor |
 | F7 | Khối ngoại châu Á mới nổi theo tuần | báo cáo tuần MIDF (qua Bernama, NST), Reuters |
 
-**Bản tin sáng – ba agent chạy song song** (chỉ thứ đổi theo ngày):
-- **B1 – dòng tiền Việt Nam:** G2 (chỉ tìm một bài xác nhận số `chi_so` được đưa), G3, và các cột hằng ngày của `von-ngoai.csv`: tỷ giá trung tâm, giá bán USD Vietcombank, giá USD tự do, liên ngân hàng qua đêm, OMO bơm/hút ròng. G1 chỉ cho mã chưa ✔ (mã ◐: thêm một nguồn; mã ✖/⊘: hai nguồn); mọi mã đã ✔ thì không tìm giá cổ phiếu.
-- **B2 – tin và quốc tế:** T1 (chỉ tin đăng sau lần chạy trước), V2 rút gọn (S&P 500, Nasdaq, Nikkei, Hang Seng, Shanghai, lợi suất Mỹ 2 và 10 năm, DXY, Brent kèm nguyên nhân, VIX, vàng, breakeven Mỹ 5 năm; bốn số sau cùng không tìm được sau một lần tìm thì ghi ⊘, không tìm tiếp), L1 cho 3 phiên tới (chỉ tìm sự kiện mới công bố so với lịch đã có), và đúng sự kiện F1/F2 nằm trong lịch 24 giờ qua nếu phiên chính nêu.
-- **B3 – doanh nghiệp và ngành tham chiếu:** theo mục 1.3 của SKILL.md, tối đa 8 tin, chỉ tin mới; mỗi tin: ngày · doanh nghiệp/ngành · tin (1 câu) · kênh ảnh hưởng tới mã nào hoặc toàn thị trường · nhãn · nguồn; ghi thành các dòng CSV đúng cột của `tham-chieu.csv`.
+**Số do phiên chính lấy từ VND MCP trước khi gọi agent (mục 1.5 của SKILL.md), agent KHÔNG tìm lại:** giá mã đã ✔, điểm VN-Index/VN30 và thanh khoản (G2), khối ngoại ròng toàn sàn HOSE (phần khối ngoại của G3), Brent và vàng (trong V2). Phiên chính ghi "VND lỗi" trong tham số nếu VND không phản hồi; khi đó agent được nêu dưới đây làm lại phần đó trên web như cũ.
+
+**Bản tin sáng – hai agent thu thập chạy song song cùng bốn agent theo mã** (chỉ thứ đổi theo ngày):
+- **B1 – dòng tiền Việt Nam:** phần tự doanh của G3 và các cột hằng ngày của `von-ngoai.csv`: tỷ giá trung tâm, giá bán USD Vietcombank, giá USD tự do, liên ngân hàng qua đêm, OMO bơm/hút ròng. Chỉ khi phiên chính nêu: G1 cho mã VND chưa xác nhận (mã ◐: thêm một nguồn; mã ✖/⊘: hai nguồn), G2 và khối ngoại toàn sàn khi "VND lỗi".
+- **B2 – tin, quốc tế và tham chiếu:** (1) tin chung toàn thị trường đăng sau lần chạy trước (tin riêng từng mã do agent theo mã làm); (2) V2 rút gọn (S&P 500, Nasdaq, Nikkei, Hang Seng, Shanghai, lợi suất Mỹ 2 và 10 năm, DXY, VIX, breakeven Mỹ 5 năm; thêm một câu nguyên nhân nếu Brent phiên chính đưa đổi ≥ 2%; VIX và breakeven không tìm được sau một lần tìm thì ghi ⊘); (3) L1 cho 3 phiên tới (chỉ sự kiện mới công bố so với lịch đã có), và đúng sự kiện F1/F2 nằm trong lịch 24 giờ qua nếu phiên chính nêu; (4) doanh nghiệp và ngành tham chiếu theo mục 1.3 của SKILL.md, tối đa 8 tin, chỉ tin mới; mỗi tin: ngày · doanh nghiệp/ngành · tin (1 câu) · kênh ảnh hưởng tới mã nào hoặc toàn thị trường · nhãn · nguồn; ghi `tham_chieu_B2.csv` đúng cột của `tham-chieu.csv`.
 T2, F3–F7, phần chính sách của F2 và phần xác suất/lịch của F1 chỉ thu thập ở phân tích sâu.
 
-**Phân tích sâu – bản đầy đủ cuối tuần gọi năm agent song song; bản cập nhật giữa tuần chỉ gọi A2, A3, A6 (A1 khi có mã chưa ✔ giá):**
-- **A1 – giá:** G1 (chỉ mã chưa ✔; mỗi mã một file `gia_<MÃ>_moi.csv`; phải thấy tên mã ở tiêu đề trang trước khi chép; ô chưa có số thì để trống, không điền tạm bằng giá đóng cửa), G2.
-- **A2 – tin doanh nghiệp và lịch:** T1, L1, và sự kiện quá khứ còn thiếu (xem "Tìm rộng sự kiện quá khứ"). Ghi `su_kien_A2.csv` cột `date,event,group,source_url,reliability,note`; `group` là loại nguyên nhân (`kqkd`, `co_tuc`, `gdkhq`, `dhcd`, `phat_hanh`, `co_dong_lon`, `dao_han_phai_sinh`, `co_cau_etf`, `nhnn_lai_suat`, `vi_mo`, `nganh`, `tin_don`…), không phải mã danh mục.
-- **A3 – dòng tiền, ngành, vĩ mô, quốc tế:** G3, T2, V1, V2, F1, F6, F7. Ở bản cập nhật giữa tuần (phiên chính sẽ nêu): bỏ T2, F6, F7, và làm thêm phần G2 (tìm một bài xác nhận số `chi_so` được đưa).
-- **A4 – tin nền tảng:** F2, F3, F4, F5; chỉ tin đăng từ lần chạy trước, tin cũ hơn chỉ ghi khi chưa có trong `su-kien-nen-tang.csv`.
-- **A6 – tham chiếu:** như B3 nhưng tối đa 12 tin (phạm vi cả tuần).
+**Phân tích sâu – bản đầy đủ cuối tuần gọi A2, A3, A4; bản cập nhật giữa tuần gọi A2, A3. Cả hai luôn gọi kèm bốn agent theo mã.** Không còn A1: giá do script và VND; mã VND chưa xác nhận hoặc "VND lỗi" thì A3 làm G1/G2 như B1.
+- **A2 – lịch, sự kiện chung và tham chiếu:** L1; sự kiện quá khứ còn thiếu của toàn thị trường (chỉ bản đầy đủ: `dao_han_phai_sinh`, `co_cau_etf`, `nhnn_lai_suat`, `vi_mo`; xem "Tìm rộng sự kiện quá khứ"); và phần tham chiếu như mục (4) của B2 nhưng tối đa 12 tin, phạm vi cả tuần (`tham_chieu_A2.csv`). Tin và sự kiện quá khứ riêng của từng mã do agent theo mã làm. Sự kiện ghi `su_kien_A2.csv` cột `date,event,group,source_url,reliability,note`; `group` là loại nguyên nhân (`kqkd`, `co_tuc`, `gdkhq`, `dhcd`, `phat_hanh`, `co_dong_lon`, `dao_han_phai_sinh`, `co_cau_etf`, `nhnn_lai_suat`, `vi_mo`, `nganh`, `tin_don`…), không phải mã danh mục.
+- **A3 – dòng tiền, ngành, vĩ mô, quốc tế:** phần tự doanh của G3, T2 (phần chung của ngành; phần riêng của mã do agent theo mã làm), V1, V2 (trừ Brent, vàng), F1, F6, F7. Bản cập nhật giữa tuần: bỏ T2, F6, F7.
+- **A4 – tin nền tảng (chỉ bản đầy đủ):** F2, F4, F5 (F3 và phần riêng của mã trong F4, F5 do agent theo mã làm); chỉ tin đăng từ lần chạy trước, tin cũ hơn chỉ ghi khi chưa có trong `su-kien-nen-tang.csv`.
 
 **A5 – kiểm chứng** (sau thu thập; luôn chạy ở phân tích sâu, ở bản tin sáng chỉ khi còn số quan trọng chưa ✔): đọc `can_kiem_chung.md` phiên chính đã ghi (mỗi dòng: mục, số, nguồn hiện có), tìm thêm nguồn cấp 1 hoặc 2 cho từng dòng, ghi `kiem_chung.md`: mục · số cuối · nhãn mới · nguồn đã dùng · ghi chú. Tối đa 10 dòng (bản tin sáng) hoặc 25 dòng (phân tích sâu); dòng còn lại để ◐.
 
@@ -124,6 +123,6 @@ T2, F3–F7, phần chính sách của F2 và phần xác suất/lịch của F1
 
 Thử lần lượt, dừng ở cách đầu tiên được:
 1. Trình duyệt trên máy tính của người dùng (chỉ khi phiên có công cụ đó; đọc skill của trình duyệt trước): mở `https://kbbuddywts.kbsec.com.vn/iis-server/investment/stocks/MBB/data_day?sdate=<dd-mm-yyyy>&edate=<dd-mm-yyyy>` rồi `fetch` cùng đường dẫn cho từng mã; mở `https://trading.vietcap.com.vn/api/chart/OHLCChart/gap-chart` (trang 404 là bình thường) rồi `fetch` POST, mỗi lần một mã, thân `{"timeFrame":"ONE_DAY","symbols":["<MÃ>"],"to":<unix giây>,"countBack":25}`. Ghi nguyên văn kết quả ra file, tải `claude/chung-khoan/data/<MÃ>.csv` (bản dự phòng) rồi chạy script với `--tu-file kbs=… vci=… --doi-chieu MBB=MBB.csv …` và nối dòng phiên mới vào file giá.
-2. Tải bản dự phòng `claude/chung-khoan/data/<MÃ>.csv`, giao B1/A1 lấy giá phiên mới từ web theo G1 (hai nguồn), đối chiếu với file. Ghi lỗi vào mục "Dữ liệu". Không thử vòng qua bằng cách khác.
+2. Tải bản dự phòng `claude/chung-khoan/data/<MÃ>.csv`, giao B1 (bản tin sáng) hoặc A3 (phân tích sâu) lấy giá phiên mới từ web theo G1 (hai nguồn), đối chiếu với file. Ghi lỗi vào mục "Dữ liệu". Không thử vòng qua bằng cách khác.
 
 Hai API này không được công bố chính thức nên cấu trúc có thể đổi; script báo lỗi cấu trúc thay vì đoán, khi đó ghi ⊘ và báo người dùng. Không dùng: API VNDirect, API cũ của TCBS (đã ngừng), bảng giá iBoard của SSI (có lớp chống bot, không vượt).
