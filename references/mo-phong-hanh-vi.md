@@ -29,7 +29,7 @@ Script KHÔNG tự lấy dữ liệu.
 
 Trước khi chạy: `mkdir -p research/mo-phong && cp research/du-an/data/mo-phong/ts_*.json research/mo-phong/ 2>/dev/null` (tham số đã hiệu chỉnh ở lần trước, agent T tải về). Không có file `ts_<MÃ>.json` thì phải chạy bước 1 cho mã đó.
 
-**1. Hiệu chỉnh (chỉ ở phân tích sâu, hoặc khi người dùng yêu cầu; khoảng 1–2 phút mỗi mã):**
+**1. Hiệu chỉnh (chỉ ở phân tích sâu, hoặc khi người dùng yêu cầu; khoảng 1–2 phút mỗi mã, cả VN-Index + 4 mã khoảng 3–4 phút khi chạy 2 tiến trình song song):**
 ```bash
 G=research/gia; S=research/skill/scripts; O=research/mo-phong; mkdir -p $O
 python $S/mo_phong_hanh_vi.py hieu-chinh --ma VNINDEX --gia $G/gia_VNINDEX_ctck.csv --khoi-ngoai $G/khoi_ngoai.csv --out $O/ts_VNINDEX.json --im
@@ -38,7 +38,7 @@ for M in <DANH_SÁCH_MÃ>; do
      --khoi-ngoai $G/khoi_ngoai.csv --out $O/ts_$M.json --im
 done
 ```
-Thử 80 bộ tham số × 8 lần chạy, rồi tinh chỉnh 35 bộ × 24 lần chạy, so 6 "dấu vân tay" của giá thật (độ biến động, đuôi dày, tự tương quan, cụm biến động, tương quan thanh khoản–biến động, tương quan khối ngoại–giá). Kiểm tra ngoài mẫu: hiệu chỉnh 70% đầu, chấm 30% sau, so với **mô hình rỗng** (không có hành vi). Lưu `ts_<MÃ>.json` vào dự án ở `claude/chung-khoan/data/mo-phong/ts_<MÃ>.json` (ghi đè) để các lần chạy sau không phải hiệu chỉnh lại.
+Thử 150 bộ tham số × 8 lần chạy (cùng một lượt tính, mọi bộ dùng chung số ngẫu nhiên nên so sánh công bằng), rồi tinh chỉnh 35 bộ × 16 lần và 21 bộ × 24 lần, so 6 "dấu vân tay" của giá thật (độ biến động, đuôi dày, tự tương quan, cụm biến động, tương quan thanh khoản–biến động, tương quan khối ngoại–giá). Kiểm tra ngoài mẫu ở **hai mốc** (hiệu chỉnh 60% đầu → chấm 20% kế tiếp; hiệu chỉnh 80% đầu → chấm 20% cuối), mỗi mốc so với **mô hình rỗng** (không có hành vi). Cạnh nhau hai lệnh `hieu-chinh` là đủ cho 2 lõi CPU; nhiều hơn chỉ xếp hàng. Lưu `ts_<MÃ>.json` vào dự án ở `claude/chung-khoan/data/mo-phong/ts_<MÃ>.json` (ghi đè) để các lần chạy sau không phải hiệu chỉnh lại.
 
 **2. Kịch bản (mỗi lần chạy; khoảng 1 phút mỗi mã với 2000 lần chạy):**
 ```bash
@@ -51,7 +51,8 @@ Sáu kịch bản: `co_so`, `tin_tot`, `tin_xau` (tin riêng của mã), `khoi_n
 ## Cách đưa vào báo cáo (quy tắc)
 
 - Mục **"Hành vi đám đông (mô phỏng)"** đặt sau mục dự báo 6 phiên. Mỗi mã 3–5 gạch đầu dòng chép từ `kb_<MÃ>.txt`: trạng thái hiện tại; kịch bản cơ sở; hai kịch bản lệch nhau nhiều nhất; ai đang là bên mua/bán chính.
-- **Luôn ghi kết quả kiểm tra ngoài mẫu.** `hanh_vi_tot_hon = false` thì ghi rõ: "mô hình hành vi chưa giải thích giá tốt hơn ngẫu nhiên ở mã này – chỉ đọc như minh họa cơ chế". Không được bỏ dòng này.
+- **Luôn ghi kết quả kiểm tra ngoài mẫu** dạng "đạt x/2 mốc" (`kiem_tra_ngoai_mau.so_moc_dat`). Chỉ 2/2 mới được viết "mô hình hành vi khớp tốt hơn ngẫu nhiên". 1/2 hoặc 0/2 thì ghi rõ: "chưa ổn định / chưa giải thích giá tốt hơn ngẫu nhiên ở mã này – chỉ đọc như minh họa cơ chế". Không được bỏ dòng này.
+- Dòng "⚠ biến động mô phỏng bằng … lần mức bình thường" có trong `kb_<MÃ>.txt` thì chép nguyên ý: vùng giá và xác suất chạm sàn của mã đó là kịch bản căng thẳng chưa kiểm chứng, không được viết như xác suất thật.
 - Tham số có `khoang_tot` rộng (vd λ từ 1,2 đến 3,3) nghĩa là dữ liệu giá không xác định được tham số đó: ghi "chưa xác định được", không diễn giải như sự thật về tâm lý nhà đầu tư.
 - Dòng tiền theo nhóm, tỷ lệ đang lãi/lỗ, PGR/PLR là **ước lượng của mô hình**, không phải số liệu thật: không gắn nhãn ✔, ghi "(mô phỏng)". Số khối ngoại đầu vào thì là số thật từ VND.
 - Vùng giá của mô phỏng hành vi KHÔNG thay thế `forecast6.py` (đã có kiểm chứng riêng). Hai bên lệch nhau nhiều thì nêu cả hai và nói mô hình nào đã được kiểm chứng lâu hơn.

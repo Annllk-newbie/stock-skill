@@ -22,8 +22,9 @@ làm tròn bước giá HOSE.
 Hiệu chỉnh ("chạy nhiều lần để tối ưu"): phương pháp mô-men mô phỏng (method of simulated moments).
 Thử nhiều bộ tham số hành vi, mỗi bộ chạy nhiều lần, so 6 "dấu vân tay" của chuỗi giá thật (độ biến động, đuôi dày,
 tự tương quan lợi suất, cụm biến động, tương quan |lợi suất|–thanh khoản, tương quan lợi suất–khối ngoại),
-chọn bộ gần nhất, rồi tinh chỉnh quanh các bộ tốt nhất. Kiểm tra NGOÀI MẪU: hiệu chỉnh trên 70% đầu, chấm trên 30% sau,
-so với mô hình rỗng không có hành vi (chỉ nhiễu + tác động giá). Mô hình hành vi không thắng mô hình rỗng thì phải nói rõ.
+chọn bộ gần nhất, rồi tinh chỉnh quanh các bộ tốt nhất. Các bộ tham số chạy chung một lượt tính và dùng chung số ngẫu nhiên
+(common random numbers). Kiểm tra NGOÀI MẪU ở hai mốc (60% → 20% kế tiếp, 80% → 20% cuối), so với mô hình rỗng không có
+hành vi (chỉ nhiễu + tác động giá). Mô hình hành vi không thắng mô hình rỗng ở cả hai mốc thì phải nói rõ.
 
 Cách dùng
   python mo_phong_hanh_vi.py hieu-chinh --ma VNINDEX --gia gia_VNINDEX_vnd.csv --khoi-ngoai khoi_ngoai.csv --out ts_VNINDEX.json
@@ -49,13 +50,14 @@ import numpy as np
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from common import load_prices  # noqa: E402
 
-PHIEN_BAN = "1.0"
+PHIEN_BAN = "1.1"
 BURN = 60            # số phiên "nạp lịch sử" (giá ép theo thật) trước khi để giá tự do
 FEE = 0.0015         # phí giao dịch mỗi chiều (ước, VNDirect khoảng 0,15–0,35%)
 TAX_SELL = 0.001     # thuế bán 0,1%
 LAM_REF = 2.25       # hệ số ngại thua lỗ tham chiếu (Tversky & Kahneman 1992)
 NU = 0.3             # tốc độ cập nhật tâm lý đám đông
 THETA0 = 0.9         # ngưỡng tín hiệu để hành động
+F = np.float32       # số thực 32-bit cho mảng agent: nhanh gấp ~2 lần, đủ chính xác cho tiền và cổ phiếu
 
 # (tên, thấp, cao, ý nghĩa)
 PARAMS = [
@@ -148,16 +150,27 @@ def build(args):
     ret = np.zeros(len(dates))
     ret[1:] = price[1:] / price[:-1] - 1
     return {"dates": dates, "price": price, "value": value, "ret": ret, "mret": mret, "have_m": have_m,
+            "share_r": getattr(args, "ty_trong_nho_le", 0.70),
             "fnet": fnet, "fgross": fgross, "n_foreign": n_f, "is_index": is_index,
             "limit": args.bien_do, "ma": args.ma.upper()}
 
 
 # ---------------- bước giá HOSE ----------------
+def tick_size(p):
+    return np.where(p < 10, 0.01, np.where(p < 50, 0.05, 0.1)).astype(np.asarray(p).dtype)
+
+
 def tick_round(p, is_index):
     if is_index:
         return p
-    t = np.where(p < 10, 0.01, np.where(p < 50, 0.05, 0.1))
+    t = tick_size(p)
     return np.round(p / t) * t
+
+
+def limit_band(p_prev, lim):
+    """Giá sàn và giá trần đã làm tròn vào trong theo bước giá."""
+    t = tick_size(p_prev)
+    return np.ceil(p_prev * (1 - lim) / t - 1e-9) * t, np.floor(p_prev * (1 + lim) / t + 1e-9) * t
 
 
 # ---------------- mô-men ----------------
@@ -202,6 +215,47 @@ def real_moments(r, v, f, n_boot=300, block=10, seed=7):
 
 
 # ---------------- bộ máy mô phỏng ----------------
+class CRN:
+    """Bộ sinh số ngẫu nhiên cho K ứng viên × R lần chạy: mọi ứng viên dùng CHUNG R bộ số ngẫu nhiên
+    (common random numbers), nên chênh lệch độ khớp giữa các ứng viên là do tham số, không do may rủi.
+    Hàng thứ k*R + r là ứng viên k, lần chạy r. K = 1 thì như bộ sinh thường."""
+
+    def __init__(self, seed, K=1):
+        self.g = np.random.default_rng(seed)
+        self.K = K
+
+    def _draw(self, f, shape):
+        shape = (shape,) if np.isscalar(shape) else tuple(shape)
+        if self.K == 1:
+            return f(shape)
+        a = f((shape[0] // self.K,) + shape[1:])
+        return np.tile(a, (self.K,) + (1,) * (a.ndim - 1))
+
+    def standard_normal(self, shape):
+        return self._draw(lambda sh: self.g.standard_normal(sh, dtype=F), shape)
+
+    def uniform(self, lo, hi, shape):
+        return self._draw(lambda sh: F(lo) + F(hi - lo) * self.g.random(sh, dtype=F), shape)
+
+    def random(self, shape):
+        return self._draw(lambda sh: self.g.random(sh, dtype=F), shape)
+
+    def choice(self, a, size, p):
+        return self._draw(lambda sh: self.g.choice(np.asarray(a, F), size=sh, p=p), size)
+
+    def integers(self, lo, hi, size):
+        return self._draw(lambda sh: self.g.integers(lo, hi, sh), size)
+
+
+def theta_arrays(theta, M):
+    """Tham số -> dict tên: mảng (M,). Nhận dict, vector 1 bộ (P,) hoặc ma trận M bộ (M, P)."""
+    if isinstance(theta, dict):
+        return {k: np.broadcast_to(np.asarray(theta[k], F), (M,)) for k in NAMES}
+    th = np.asarray(theta, F)
+    th = np.broadcast_to(th, (M, len(NAMES))) if th.ndim == 1 else th
+    return {k: th[:, j] for j, k in enumerate(NAMES)}
+
+
 class Pop:
     """Trạng thái agent cho M lần chạy song song."""
 
@@ -216,47 +270,47 @@ class Pop:
         self.cash = cap - self.shares * p0 * 1000
         # giá vốn lấy mẫu theo phân bố khối lượng các phiên trước (hồ sơ khối lượng)
         pp, ww = profile
-        self.cost = rng.choice(pp, size=(M, n), p=ww / ww.sum())
-        self.lock = np.zeros((M, n))
-        self.cool = np.zeros((M, n))
-        self.L = np.where(rng.random((M, n)) < 0.3, 0.12, rng.uniform(0.08, 0.25, (M, n)))  # 30% dùng margin
+        self.cost = rng.choice(pp, (M, n), ww / ww.sum())
+        self.lock = np.zeros((M, n), F)
+        self.cool = np.zeros((M, n), F)
+        self.L = np.where(rng.random((M, n)) < 0.3, F(0.12), rng.uniform(0.08, 0.25, (M, n)))  # 30% dùng margin
         self.L[:, nr:] = 0.10
 
 
-def run(theta, D, start, n_forced, n_free, M, rng, nr=600, nl=30, scen=None, mpaths=None, share_r=0.70,
-        record_agents=False):
-    """Chạy M lần song song.
+def run(theta, D, start, n_forced, n_free, M, rng, nr=600, nl=30, scen=None, mpaths=None, record_agents=False):
+    """Chạy M lần song song (mỗi lần có thể mang bộ tham số riêng).
     start: chỉ số phiên đầu tiên của đoạn ép giá; n_forced phiên ép giá thật, rồi n_free phiên giá tự do.
     Trong đoạn tự do: nếu n_free vượt dữ liệu (tương lai) thì khối ngoại và VN-Index lấy theo scen/mpaths.
     Trả dict: ret (M,n_free), val (M,n_free), các luồng tiền theo nhóm, chỉ báo hành vi."""
-    th = dict(zip(NAMES, theta)) if not isinstance(theta, dict) else theta
+    th = theta_arrays(theta, M)
+    share_r = D.get("share_r", 0.70)
     h, wt, bm = th["bay_dan"], th["xu_huong"], th["theo_thi_truong"]
     lam, dsp, phi = th["ngai_lo"], th["ban_som"], th["neo_gia_tri"]
     kap, sn = th["kappa"], th["nhieu"]
     P, R, V, MR, FN, FG = D["price"], D["ret"], D["value"], D["mret"], D["fnet"], D["fgross"]
     Tdat = len(P)
     is_index, lim = D["is_index"], D["limit"]
-    sig = max(np.std(R[max(1, start - 250):start + n_forced]), 0.004)
-    sig_m = max(np.std(MR[max(1, start - 250):start + n_forced]), 0.003) if D["have_m"] else 1.0
+    sig = float(max(np.std(R[max(1, start - 250):start + n_forced]), 0.004))
+    sig_m = float(max(np.std(MR[max(1, start - 250):start + n_forced]), 0.003)) if D["have_m"] else 1.0
     lo = max(0, start - 60)
     prof = (P[lo:start + 1], np.maximum(V[lo:start + 1], 1.0))
-    pop = Pop(rng, M, nr, nl, P[start], prof)
-    vbar = V[max(0, start + n_forced - 60):start + n_forced].mean()
-    fshare = min(0.4, FG[max(0, start + n_forced - 120):start + n_forced].mean() / vbar) if vbar > 0 else 0.0
+    pop = Pop(rng, M, nr, nl, float(P[start]), prof)
+    vbar = float(V[max(0, start + n_forced - 60):start + n_forced].mean())
+    fshare = float(min(0.4, FG[max(0, start + n_forced - 120):start + n_forced].mean() / vbar)) if vbar > 0 else 0.0
     share_l = max(0.05, 1 - share_r - fshare)
     isr = pop.is_r
 
-    hist = np.tile(P[max(0, start - 20):start + 1], (M, 1))   # lịch sử giá (M, ≤21)
-    ema = np.full(M, P[max(0, start - 120):start + 1].mean())
-    x = np.zeros(M)
-    g_r = np.zeros(M)
-    g_l = np.zeros(M)
+    hist = np.tile(P[max(0, start - 20):start + 1].astype(F), (M, 1))   # lịch sử giá (M, ≤21)
+    ema = np.full(M, P[max(0, start - 120):start + 1].mean(), F)
+    x = np.zeros(M, F)
+    g_r = np.zeros(M, F)
+    g_l = np.zeros(M, F)
     wr = wl = None
     T = n_forced + n_free
     out = {k: np.zeros((M, n_free)) for k in ("ret", "val", "net_r", "net_l", "net_f", "x", "capit", "chot_lai",
                                                 "gong_lo")}
     news = np.zeros(n_free) if scen is None else scen.get("news", np.zeros(n_free))
-    fund = 0.0 if scen is None else scen.get("fund", 0.0)
+    fund = 0.0 if scen is None else float(scen.get("fund", 0.0))
     for t in range(T):
         i = start + t + 1                   # phiên đang mô phỏng
         free = t >= n_forced
@@ -264,31 +318,32 @@ def run(theta, D, start, n_forced, n_free, M, rng, nr=600, nl=30, scen=None, mpa
         p_prev = hist[:, -1]
         # đầu vào ngoại sinh
         if i < Tdat and (mpaths is None or not free):
-            mret_t = np.full(M, MR[i])
-            f_t = np.full(M, FN[i])
+            mret_t = np.full(M, MR[i], F)
+            f_t = np.full(M, FN[i], F)
         else:
-            mret_t = mpaths[:, k] if mpaths is not None else np.zeros(M)
-            f_t = scen["foreign"][:, k] if scen is not None and "foreign" in scen else np.zeros(M)
+            mret_t = (mpaths[:, k] if mpaths is not None else np.zeros(M)).astype(F)
+            f_t = (scen["foreign"][:, k] if scen is not None and "foreign" in scen else np.zeros(M)).astype(F)
         # ---- tâm lý đám đông (Lux–Marchesi rút gọn) ----
         z5 = (p_prev / hist[:, max(0, hist.shape[1] - 6)] - 1) / (sig * math.sqrt(5))
         zm = mret_t / sig_m if D["have_m"] else 0.0
-        nw = news[k] if free else 0.0
-        x = (1 - NU) * x + NU * np.tanh(h * x + wt * z5 + bm * zm + nw) + 0.08 * rng.standard_normal(M)
+        nw = float(news[k]) if free else 0.0
+        x = (1 - NU) * x + NU * np.tanh(h * x + wt * z5 + bm * zm + nw) + F(0.08) * rng.standard_normal(M)
         x = np.clip(x, -1, 1)
-        vr = (np.std(np.diff(hist[:, -6:], axis=1) / hist[:, -6:-1], axis=1) / sig) if hist.shape[1] >= 6 else np.ones(M)
+        vr = (np.std(np.diff(hist[:, -6:], axis=1) / hist[:, -6:-1], axis=1) / sig) if hist.shape[1] >= 6 else np.ones(M, F)
         # ---- quyết định từng agent ----
         held = pop.shares > 0
         g = np.where(held, p_prev[:, None] / pop.cost - 1, 0.0)
         gs = g / (sig * math.sqrt(5))
-        disp = np.where(g > 0, -dsp * np.minimum(gs, 3), dsp * (lam / LAM_REF) * np.minimum(-gs, 2)) * held
+        disp = np.where(g > 0, -dsp[:, None] * np.minimum(gs, 3),
+                        (dsp * lam / LAM_REF)[:, None] * np.minimum(-gs, 2)) * held
         eta = rng.standard_normal(pop.shares.shape)
         sig_r = x[:, None] + 0.6 * eta + disp
         gap = (ema * (1 + fund if free else 1) - p_prev) / p_prev / (sig * math.sqrt(20))
-        sig_l = phi * gap[:, None] + 0.3 * h * x[:, None] + 0.5 * eta + 0.3 * disp
+        sig_l = (phi * gap + 0.3 * h * x)[:, None] + 0.5 * eta + 0.3 * disp
         s = np.where(isr[None, :], sig_r, sig_l)
         th_b = THETA0 * (1 + 0.5 * (lam - 1) * np.maximum(0, vr - 1))[:, None]
-        th_b = np.where(isr[None, :], th_b, 0.7)
-        th_s = np.where(isr[None, :], THETA0, 0.7)
+        th_b = np.where(isr[None, :], th_b, F(0.7))
+        th_s = np.where(isr[None, :], F(THETA0), F(0.7))
         sellable = np.maximum(pop.shares - pop.lock, 0)
         lot_cost = p_prev[:, None] * 1000 * 100
         buy = (s > th_b) & (pop.cool <= 0) & (pop.cash >= lot_cost)
@@ -309,7 +364,7 @@ def run(theta, D, start, n_forced, n_free, M, rng, nr=600, nl=30, scen=None, mpa
         net_l = ((bv - sv) * ~isr).sum(1)
         # ---- giá ----
         if not free:
-            p_new = np.full(M, P[i])
+            p_new = np.full(M, P[i], F)
             g_r += gross_r
             g_l += gross_l
             if t == n_forced - 1:
@@ -319,13 +374,9 @@ def run(theta, D, start, n_forced, n_free, M, rng, nr=600, nl=30, scen=None, mpa
             dem = wr * net_r + wl * net_l + f_t
             r_t = kap * dem / vbar + sn * rng.standard_normal(M)
             r_t = np.clip(r_t, -lim, lim)
-            p_new = tick_round(p_prev * (1 + r_t), is_index)
+            p_new = tick_round(p_prev * (1 + r_t), is_index).astype(F)
             if not is_index:  # giữ trong biên độ sau khi làm tròn
-                ceil_ = np.floor(p_prev * (1 + lim) / np.where(p_prev < 10, 0.01, np.where(p_prev < 50, 0.05, 0.1)) + 1e-9) \
-                    * np.where(p_prev < 10, 0.01, np.where(p_prev < 50, 0.05, 0.1))
-                flo_ = np.ceil(p_prev * (1 - lim) / np.where(p_prev < 10, 0.01, np.where(p_prev < 50, 0.05, 0.1)) - 1e-9) \
-                    * np.where(p_prev < 10, 0.01, np.where(p_prev < 50, 0.05, 0.1))
-                p_new = np.clip(p_new, flo_, ceil_)
+                p_new = np.clip(p_new, *limit_band(p_prev, lim))
             out["ret"][:, k] = p_new / p_prev - 1
             out["val"][:, k] = (wr * gross_r + wl * gross_l + np.abs(f_t) + (FG[i] if i < Tdat else fshare * vbar)) / vbar
             out["net_r"][:, k] = wr * net_r
@@ -349,25 +400,39 @@ def run(theta, D, start, n_forced, n_free, M, rng, nr=600, nl=30, scen=None, mpa
         pop.cost = np.where(newsh <= 0, p_new[:, None], pop.cost)
         pop.shares = newsh
         pop.lock = q_b                                  # T+2: mua phiên này, phiên sau chưa bán được
-        pop.cool = np.where(capit & isr[None, :], np.round(2 * lam), pop.cool - 1)
+        pop.cool = np.where(capit & isr[None, :], np.round(2 * lam)[:, None], pop.cool - 1)
         hist = np.concatenate([hist[:, 1:] if hist.shape[1] >= 21 else hist, p_new[:, None]], axis=1)
         ema = ema + (p_new - ema) * (2 / 121)
     out["wr"], out["wl"], out["share_l"], out["fshare"] = wr, wl, share_l, fshare
     if record_agents:
-        held = pop.shares > 0
         out["agents"] = pop
     return out
 
 
 # ---------------- hiệu chỉnh ----------------
-def loss_of(theta, D, start, n_free, target, se, M, seed):
-    rng = np.random.default_rng(seed)       # cùng hạt giống cho mọi ứng viên (common random numbers)
-    o = run(theta, D, start, BURN, n_free, M, rng)
+MAX_ROWS = 1600   # số lần chạy tối đa trong một lượt tính (giới hạn bộ nhớ ~ vài trăm MB)
+
+
+def window(D, start, n_free):
     i0 = start + BURN + 1
-    f = D["fnet"][i0:i0 + n_free] / max(D["value"][i0 - 60:i0].mean(), 1)
-    ms = moments(o["ret"], o["val"], np.tile(f, (M, 1)))
-    mm = ms.mean(axis=0)
-    return float((((mm - target) / se) ** 2).sum()), mm
+    vb = max(D["value"][i0 - 60:i0].mean(), 1.0)
+    return D["ret"][i0:i0 + n_free], D["value"][i0:i0 + n_free] / vb, D["fnet"][i0:i0 + n_free] / vb
+
+
+def losses(thetas, D, start, n_free, target, se, R, seed):
+    """Độ lệch của K bộ tham số, mỗi bộ R lần chạy, chạy theo lô; mọi bộ dùng chung số ngẫu nhiên."""
+    thetas = np.atleast_2d(thetas)
+    f = window(D, start, n_free)[2]
+    per = max(1, MAX_ROWS // R)
+    Ls, MMs = [], []
+    for c in range(0, len(thetas), per):
+        th = thetas[c:c + per]
+        K = len(th)
+        o = run(np.repeat(th, R, axis=0), D, start, BURN, n_free, K * R, CRN(seed, K))
+        mm = moments(o["ret"], o["val"], np.tile(f, (K * R, 1))).reshape(K, R, -1).mean(axis=1)
+        Ls.append((((mm - target) / se) ** 2).sum(axis=1))
+        MMs.append(mm)
+    return np.concatenate(Ls), np.concatenate(MMs)
 
 
 def lhs(rng, n, fixed=None):
@@ -375,60 +440,65 @@ def lhs(rng, n, fixed=None):
     hi = np.array([p[2] for p in PARAMS])
     u = (rng.permuted(np.tile(np.arange(n), (len(PARAMS), 1)), axis=1).T + rng.random((n, len(PARAMS)))) / n
     th = lo + u * (hi - lo)
+    return apply_fixed(th, fixed)
+
+
+def apply_fixed(th, fixed):
     if fixed:
         for kname, v in fixed.items():
-            th[:, NAMES.index(kname)] = v
+            th[..., NAMES.index(kname)] = v
     return th
 
 
-def calibrate(D, start, n_free, n_cand, M, seed, fixed=None, log=None):
-    i0 = start + BURN + 1
-    r = D["ret"][i0:i0 + n_free]
-    v = D["value"][i0:i0 + n_free] / D["value"][i0 - 60:i0].mean()
-    f = D["fnet"][i0:i0 + n_free] / D["value"][i0 - 60:i0].mean()
-    target, se = real_moments(r, v, f)
+def spearman(a, b):
+    ra = np.argsort(np.argsort(a))
+    rb = np.argsort(np.argsort(b))
+    return 0.0 if np.std(ra) == 0 or np.std(rb) == 0 else float(np.corrcoef(ra, rb)[0, 1])
+
+
+def calibrate(D, start, n_free, n_cand, R, seed, fixed=None, log=None):
+    """Vòng 1: n_cand bộ phủ đều không gian (Latin hypercube), R lần chạy mỗi bộ.
+    Vòng 2, 3: tinh chỉnh quanh các bộ tốt nhất, bước nhỏ dần, chạy 2R rồi 3R lần."""
+    target, se = real_moments(*window(D, start, n_free))
     rng = np.random.default_rng(seed)
     cands = lhs(rng, n_cand, fixed)
-    res = []
-    for j, th in enumerate(cands):
-        L, mm = loss_of(th, D, start, n_free, target, se, M, seed + 1)
-        res.append((L, th, mm))
-        if log and (j + 1) % 20 == 0:
-            log(f"  vòng 1: {j + 1}/{n_cand}")
-    res.sort(key=lambda z: z[0])
-    # độ xác định của từng tham số: khoảng của 10% bộ tốt nhất vòng 1 (cùng số lần chạy, phủ đều không gian)
-    top = np.array([z[1] for z in res[:max(3, len(res) // 10)]])
-    # độ nhạy: tương quan hạng (Spearman) giữa giá trị tham số và độ lệch trên mọi ứng viên vòng 1
-    Ls = np.argsort(np.argsort([z[0] for z in res]))
-    TH = np.array([z[1] for z in res])
-    sens = []
-    for j in range(len(PARAMS)):
-        rk = np.argsort(np.argsort(TH[:, j]))
-        sens.append(0.0 if np.std(rk) == 0 else float(np.corrcoef(rk, Ls)[0, 1]))
+    L1, M1 = losses(cands, D, start, n_free, target, se, R, seed + 1)
+    log and log(f"  vòng 1 xong: {n_cand} bộ × {R} lần")
+    order = np.argsort(L1)
+    top = cands[order[:max(3, n_cand // 10)]]          # 10% bộ tốt nhất: độ xác định của tham số
+    sens = [spearman(cands[:, j], L1) for j in range(len(PARAMS))]
     lo = np.array([p[1] for p in PARAMS])
     hi = np.array([p[2] for p in PARAMS])
-    best = res
-    # vòng 2, 3: tinh chỉnh quanh các bộ tốt nhất, bước nhỏ dần, chạy nhiều lần hơn
-    n_ref = 0
+    best_th, best_L, best_M = cands[order], L1[order], M1[order]
+    n_runs = n_cand * R
     for keep, step, mult, sd in ((5, 0.08, 2, 2), (3, 0.03, 3, 3)):
-        refined = []
-        for _, th0, _ in best[:keep]:
-            refined.append(th0)
-            for _ in range(6):
-                th = np.clip(th0 + rng.normal(0, step, len(PARAMS)) * (hi - lo), lo, hi)
-                if fixed:
-                    for kname, val in fixed.items():
-                        th[NAMES.index(kname)] = val
-                refined.append(th)
-        best = []
-        for th in refined:
-            L, mm = loss_of(th, D, start, n_free, target, se, M * mult, seed + sd)
-            best.append((L, th, mm))
-        best.sort(key=lambda z: z[0])
-        n_ref += len(refined) * M * mult
-    res2 = best
-    return {"best": res2[0][1], "loss": res2[0][0], "sim_moments": res2[0][2], "target": target, "se": se,
-            "top_lo": top.min(axis=0), "top_hi": top.max(axis=0), "do_nhay": sens, "n_runs": n_cand * M + n_ref}
+        base = best_th[:keep]
+        jit = np.clip(np.repeat(base, 6, axis=0) + rng.normal(0, step, (keep * 6, len(PARAMS))) * (hi - lo), lo, hi)
+        ref = apply_fixed(np.concatenate([base, jit]), fixed)
+        L, MM = losses(ref, D, start, n_free, target, se, R * mult, seed + sd)
+        o = np.argsort(L)
+        best_th, best_L, best_M = ref[o], L[o], MM[o]
+        n_runs += len(ref) * R * mult
+    return {"best": best_th[0], "loss": float(best_L[0]), "sim_moments": best_M[0], "target": target, "se": se,
+            "top_lo": top.min(axis=0), "top_hi": top.max(axis=0), "do_nhay": sens, "n_runs": n_runs}
+
+
+def oos_check(D, start, n_all, n_cand, R, seed, fx):
+    """Kiểm tra ngoài mẫu ở HAI mốc (hiệu chỉnh 60% → chấm 20% kế tiếp; hiệu chỉnh 80% → chấm 20% cuối),
+    so với mô hình rỗng (không hành vi). Một mốc dễ trúng/trượt do may rủi; hai mốc ổn định hơn."""
+    res = []
+    for frac in (0.6, 0.8):
+        n_tr = int(n_all * frac)
+        n_te = min(int(n_all * 0.2), n_all - n_tr)
+        cb = calibrate(D, start, n_tr, n_cand, R, seed + int(frac * 10), fixed=fx)
+        cn = calibrate(D, start, n_tr, max(20, n_cand // 4), R, seed + int(frac * 10), fixed=NULL_FIXED)
+        st2 = start + n_tr
+        tgt, se = real_moments(*window(D, st2, n_te))
+        L, _ = losses(np.stack([cb["best"], cn["best"]]), D, st2, n_te, tgt, se, R * 3, seed + 9)
+        res.append({"phien_hieu_chinh": n_tr, "phien_kiem_tra": n_te, "loss_mo_hinh_hanh_vi": round(float(L[0]), 2),
+                    "loss_mo_hinh_rong": round(float(L[1]), 2), "hanh_vi_tot_hon": bool(L[0] < L[1]),
+                    "so_lan_chay": cb["n_runs"] + cn["n_runs"] + 2 * R * 3})
+    return res
 
 
 def cmd_calibrate(args):
@@ -444,25 +514,13 @@ def cmd_calibrate(args):
     n_all = T - start - BURN - 1
     if n_all < 80:
         sys.exit(f"Dữ liệu quá ngắn: còn {n_all} phiên sau {BURN} phiên nạp, cần ≥ 80.")
-    n_tr = int(n_all * 0.7)
-    n_te = n_all - n_tr
-    log and log(f"[{D['ma']}] hiệu chỉnh trên {n_tr} phiên, kiểm tra ngoài mẫu {n_te} phiên")
     seed = args.seed + sum(ord(c) * 31 ** i for i, c in enumerate(D["ma"])) % 10007
     fx = None if D["have_m"] else {"theo_thi_truong": 0.0}
-    cal_tr = calibrate(D, start, n_tr, args.ung_vien, args.lan, seed, fixed=fx, log=log)
-    null_tr = calibrate(D, start, n_tr, max(20, args.ung_vien // 4), args.lan, seed, fixed=NULL_FIXED)
-    # chấm ngoài mẫu: nạp lịch sử tới hết đoạn hiệu chỉnh rồi để giá tự do trên đoạn kiểm tra
-    st2 = start + n_tr
-    i0 = st2 + BURN + 1
-    r = D["ret"][i0:i0 + n_te]
-    v = D["value"][i0:i0 + n_te] / D["value"][i0 - 60:i0].mean()
-    f = D["fnet"][i0:i0 + n_te] / D["value"][i0 - 60:i0].mean()
-    tgt, se = real_moments(r, v, f)
-    L_beh, _ = loss_of(cal_tr["best"], D, st2, n_te, tgt, se, args.lan * 3, seed + 9)
-    L_null, _ = loss_of(null_tr["best"], D, st2, n_te, tgt, se, args.lan * 3, seed + 9)
-    # hiệu chỉnh lại trên toàn bộ để dùng cho kịch bản
-    log and log(f"[{D['ma']}] hiệu chỉnh lại trên toàn bộ {n_all} phiên")
+    log and log(f"[{D['ma']}] kiểm tra ngoài mẫu ở 2 mốc trên {n_all} phiên")
+    oos = oos_check(D, start, n_all, args.ung_vien, args.lan, seed, fx)
+    log and log(f"[{D['ma']}] hiệu chỉnh trên toàn bộ {n_all} phiên")
     cal = calibrate(D, start, n_all, args.ung_vien, args.lan, seed + 100, fixed=fx, log=log)
+    wins = sum(o["hanh_vi_tot_hon"] for o in oos)
     out = {
         "ma": D["ma"], "phien_ban": PHIEN_BAN, "tao_luc": dt.datetime.now().isoformat(timespec="seconds"),
         "du_lieu": {"tu": D["dates"][start].isoformat(), "den": D["dates"][-1].isoformat(), "so_phien": T - start,
@@ -478,15 +536,15 @@ def cmd_calibrate(args):
         "mo_men_mo_phong": dict(zip(MOMENTS, np.round(cal["sim_moments"], 3).tolist())),
         "sai_so_chuan": dict(zip(MOMENTS, np.round(cal["se"], 3).tolist())),
         "do_khop": round(cal["loss"], 2),
-        "kiem_tra_ngoai_mau": {"phien_hieu_chinh": n_tr, "phien_kiem_tra": n_te,
-                               "loss_mo_hinh_hanh_vi": round(L_beh, 2), "loss_mo_hinh_rong": round(L_null, 2),
-                               "hanh_vi_tot_hon": bool(L_beh < L_null)},
-        "so_lan_chay_hieu_chinh": int(cal["n_runs"] + cal_tr["n_runs"] + null_tr["n_runs"]),
+        "kiem_tra_ngoai_mau": {"so_moc_dat": wins, "so_moc": len(oos), "hanh_vi_tot_hon": wins == len(oos),
+                               "cac_moc": oos},
+        "so_lan_chay_hieu_chinh": int(cal["n_runs"] + sum(o["so_lan_chay"] for o in oos)),
         "ty_trong_nho_le": args.ty_trong_nho_le,
     }
     with open(args.out, "w", encoding="utf-8") as fo:
         json.dump(out, fo, ensure_ascii=False, indent=1)
-    print(json.dumps({k: out[k] for k in ("ma", "tham_so", "do_khop", "kiem_tra_ngoai_mau")}, ensure_ascii=False))
+    print(json.dumps({k: out[k] for k in ("ma", "tham_so", "do_khop")} |
+                     {"ngoai_mau": f"{wins}/{len(oos)} mốc", "chua_xac_dinh": out["chua_xac_dinh"]}, ensure_ascii=False))
 
 
 # ---------------- kịch bản tương lai ----------------
@@ -540,7 +598,7 @@ def cmd_scen(args):
         scA = scenarios(DA, M, n, np.random.default_rng(args.seed + 5))
         for name in sc:
             sA = scA["thi_truong_hoang_loan"] if sc[name].get("chi_thi_truong") else scA["co_so"]
-            oA = run(thA, DA, TA - 1 - BURN, BURN, n, M, np.random.default_rng(args.seed + 11), scen=sA)
+            oA = run(thA, DA, TA - 1 - BURN, BURN, n, M, CRN(args.seed + 11), scen=sA)
             mp[name] = oA["ret"]
     elif D["have_m"]:
         mr = D["mret"][-250:]
@@ -552,12 +610,17 @@ def cmd_scen(args):
                 base[:, 1] += -0.02
             mp[name] = base
     p_last = D["price"][-1]
+    # mức biến động "bình thường" mà mô hình được hiệu chỉnh theo (độ lệch chuẩn lợi suất của kỳ hiệu chỉnh)
+    base_sd = max(meta.get("mo_men_that", {}).get("do_bien_dong", 100 * D["ret"][-250:].std()) / 100, 1e-6)
     res = {"ma": D["ma"], "phien_cuoi": D["dates"][-1].isoformat(), "gia_cuoi": float(p_last),
            "so_lan_chay": M, "so_phien": n, "tham_so": th, "kiem_tra_ngoai_mau": meta.get("kiem_tra_ngoai_mau"),
            "chua_xac_dinh": meta.get("chua_xac_dinh", []), "hieu_chinh_luc": meta.get("tao_luc"),
+           "bien_dong_ky_hieu_chinh_pct": round(100 * base_sd, 2),
+           "duoi_day_that_vs_mo_phong": [meta.get("mo_men_that", {}).get("duoi_day"),
+                                         meta.get("mo_men_mo_phong", {}).get("duoi_day")],
            "kich_ban": {}}
     # trạng thái hiện tại: chạy nạp lịch sử 60 phiên với số lần nhỏ để đọc tâm lý và lãi/lỗ của nhỏ lẻ
-    o0 = run(th, D, start, BURN, 1, 400, np.random.default_rng(args.seed + 3), scen=sc["co_so"] | {
+    o0 = run(th, D, start, BURN, 1, 400, CRN(args.seed + 3), scen=sc["co_so"] | {
         "foreign": sc["co_so"]["foreign"][:400, :1]}, mpaths=(mp["co_so"][:400, :1] if mp else None), record_agents=True)
     pop = o0["agents"]
     held = pop.shares[:, :pop.nr] > 0
@@ -570,11 +633,11 @@ def cmd_scen(args):
         "ema120": round(float(D["price"][-120:].mean()), 2),
     }
     for name, s in sc.items():
-        o = run(th, D, start, BURN, n, M, np.random.default_rng(args.seed + 21), scen=s, mpaths=mp.get(name))
+        o = run(th, D, start, BURN, n, M, CRN(args.seed + 21), scen=s, mpaths=mp.get(name))
         path = p_last * np.cumprod(1 + o["ret"], axis=1)
         qs = np.percentile(path, [2.5, 10, 25, 50, 75, 90, 97.5], axis=0)
         lim = D["limit"] - 0.006          # trừ một bước giá: giá trần/sàn đã làm tròn xuống bước giá
-        sd_ratio = float(o["ret"].std() / max(D["ret"][-120:].std(), 1e-6))
+        sd_ratio = float(o["ret"].std() / base_sd)
         res["kich_ban"][name] = {
             "mo_ta": s["mo_ta"],
             "bien_dong_so_voi_thuc": round(sd_ratio, 2),
@@ -604,9 +667,16 @@ def text(res):
     L.append(f"Mô phỏng hành vi {res['ma']} – {res['so_lan_chay']} lần chạy × {res['so_phien']} phiên, từ giá "
              f"{res['gia_cuoi']} (phiên {res['phien_cuoi']}). Mô hình để hiểu hành vi, không phải dự báo chắc chắn.")
     k = res.get("kiem_tra_ngoai_mau") or {}
-    if k:
+    if k.get("cac_moc"):
+        diem = "; ".join(f"{m['loss_mo_hinh_hanh_vi']} so với {m['loss_mo_hinh_rong']}" for m in k["cac_moc"])
+        kl = ("KHỚP TỐT HƠN mô hình rỗng ở cả" if k["hanh_vi_tot_hon"] else
+              "chỉ tốt hơn mô hình rỗng ở" if k["so_moc_dat"] else "KHÔNG tốt hơn mô hình rỗng ở mốc nào trong")
+        L.append(f"- Kiểm tra ngoài mẫu: mô hình hành vi {kl} {k['so_moc_dat']}/{k['so_moc']} mốc "
+                 f"(điểm lệch hành vi so với rỗng: {diem}; càng nhỏ càng khớp)"
+                 + ("." if k["hanh_vi_tot_hon"] else " – chỉ đọc như minh họa cơ chế."))
+    elif k:
         L.append("- Kiểm tra ngoài mẫu: mô hình hành vi " + ("KHỚP TỐT HƠN" if k.get("hanh_vi_tot_hon") else "KHÔNG tốt hơn")
-                 + f" mô hình rỗng (điểm lệch {k['loss_mo_hinh_hanh_vi']} so với {k['loss_mo_hinh_rong']}; càng nhỏ càng khớp).")
+                 + f" mô hình rỗng (điểm lệch {k['loss_mo_hinh_hanh_vi']} so với {k['loss_mo_hinh_rong']}).")
     t = res["tham_so"]
     L.append(f"- Hành vi hiệu chỉnh: bầy đàn {t['bay_dan']:.2f} · đuổi xu hướng {t['xu_huong']:.2f} · nhìn VN-Index "
              f"{t['theo_thi_truong']:.2f} · ngại lỗ λ {t['ngai_lo']:.2f} · bán sớm {t['ban_som']:.2f} · NĐT lớn neo giá trị {t['neo_gia_tri']:.2f}"
@@ -615,9 +685,14 @@ def text(res):
              f"{hn['ty_le_nho_le_dang_lai'] * 100:.0f}% nhỏ lẻ đang lãi, {hn['ty_le_nho_le_lo_tren_10pct'] * 100:.0f}% lỗ trên 10%; "
              f"giá vốn trung vị nhỏ lẻ {hn['gia_von_trung_vi_nho_le']}, EMA120 {hn['ema120']}.")
     r0 = res["kich_ban"]["co_so"]["bien_dong_so_voi_thuc"]
-    if r0 > 1.3 or r0 < 0.7:
-        L.append(f"- ⚠ Ở kịch bản cơ sở, biến động mỗi phiên của mô phỏng bằng {r0:.1f} lần thực tế 120 phiên gần đây: "
-                 + ("vùng giá dưới đây RỘNG hơn thực tế, đọc như kịch bản căng thẳng." if r0 > 1.3 else "vùng giá dưới đây HẸP hơn thực tế."))
+    if r0 > 1.3:
+        why = (f"đám đông đang sợ hãi ({hn['tam_ly_dam_dong']:+.2f}) nên trong mô hình dễ xảy ra cắt lỗ dây chuyền rồi bật lại"
+               if hn["tam_ly_dam_dong"] < -0.4 else "trạng thái hiện tại của đám đông khác xa mức bình quân")
+        L.append(f"- ⚠ Ở kịch bản cơ sở, biến động mỗi phiên của mô phỏng bằng {r0:.1f} lần mức bình thường của mã "
+                 f"({res['bien_dong_ky_hieu_chinh_pct']}%/phiên): {why}. Mô hình chưa tái tạo đúng tần suất phiên sốc của giá thật, "
+                 f"nên xác suất chạm sàn và vùng giá dưới đây là kịch bản căng thẳng, CHƯA kiểm chứng.")
+    elif r0 < 0.7:
+        L.append(f"- ⚠ Biến động mô phỏng chỉ bằng {r0:.1f} lần mức bình thường của mã: vùng giá dưới đây HẸP hơn thực tế.")
     for name, s in res["kich_ban"].items():
         n = res["so_phien"]
         v = s["vung_gia"][f"phien_{n}"]
