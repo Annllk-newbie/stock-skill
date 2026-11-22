@@ -1,6 +1,6 @@
 # Trang web: ưu tiên, không dùng, dự phòng
 
-Ai đọc: agent thu thập B1, B2, A2, A3, A4, A5 (agent theo mã chỉ đọc khi trang trong `agent-ma.md` không đủ). Cách lấy trang (WebSearch trước rồi WebFetch link kết quả) ở `thu-thap.md`.
+Ai đọc: agent thu thập B2, A2, A3, A4, A5 (agent theo mã chỉ đọc khi trang trong `agent-ma.md` không đủ). Cách lấy trang (WebSearch trước rồi WebFetch link kết quả) ở `thu-thap.md`.
 
 ## Trang web ưu tiên
 Khảo sát 14/11/2026, chỉ giữ trang tin cậy trung bình đến cao và đọc được. Vẫn tìm thêm ở nguồn khác khi cần. Mỗi số ghi "nguồn + ngày"; số quan trọng phải khớp hai nguồn mới được ✔.

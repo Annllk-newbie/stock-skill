@@ -11,7 +11,7 @@ Mục tiêu: đọc xong trong **3 phút trên điện thoại** (thân bản ti
 2. **Song song:** gọi agent T (`the/T.md`, chế độ B); trong lúc đó gọi VND theo mục "VND MCP" của `phien-chinh.md` và ghi `<W>/gia/vnd.json`.
 3. Agent T xong: `C gia --phien <phiên gần nhất đã đóng cửa> --cong-cu "<tên các công cụ mcp__VND__ đã nạp>"`. Mã thoát 2 → bù phiên thiếu hoặc DỪNG theo `phien-chinh.md`.
 4. Đọc từ đĩa: `<W>/du-an/data/TOM-TAT.md` và `<W>/du-an/data/MOC-THEO-DOI.md`. Không đọc các CSV: xử lý bằng Python, chỉ in vài dòng.
-5. Gọi song song **B1, B2** và **một agent theo mã cho mỗi mã** (lời giao việc ở `phien-chinh.md`). Tin "T1" của bản tin lấy từ mục "Tin doanh nghiệp", "Sự kiện công bố", "Hệ sinh thái" của `<W>/ma/<MÃ>.md`.
+5. Gọi song song **B2** (agent thu thập duy nhất) và **agent M** (một agent làm cho mọi mã; lời giao việc ở `phien-chinh.md`). Tin "T1" của bản tin lấy từ mục "Tin doanh nghiệp", "Sự kiện công bố", "Hệ sinh thái" của `<W>/ma/<MÃ>.md`.
 6. Gắn nhãn và ghi nhật ký số liệu (`phien-chinh.md`, bước 18–19); chỉ khi còn số quan trọng chưa ✔ mới gọi A5 (tối đa 10 dòng), không thì ghi nhật ký BỎ QUA.
 7. `C tinh [--nghi yyyy-mm-dd …]`: điểm áp lực khối ngoại, chuỗi truyền dẫn, dự báo 6 phiên và biểu đồ các mã có biểu đồ, giá so với TB20 của các mã còn lại (`<W>/tb20.txt`). Không chạy `cycles.py`: vị trí chu kỳ = vị trí trong `MOC-THEO-DOI.md` cộng số phiên đã qua.
 8. Viết **thân bản tin** theo mẫu vào `<W>/ban_tin.md`, phần đầu ghi chú vào `<W>/ghi_chu_dau.md`, và các mục tự viết của phụ lục vào `<W>/phu_luc_tu_viet.md` dưới đúng tiêu đề mẫu: luôn có `## Chưa kiểm chứng`, `## Đã thu thập nhưng không dùng`, `## Độ chính xác dự báo`, `## Tin nền tảng mới`, `## Lịch sự kiện 10 ngày tới` (lấy từ `MOC-THEO-DOI.md` cộng sự kiện mới của B2). Rồi `C ghep`: ghép `<W>/phu_luc.md` đúng mẫu phụ lục (mục thiếu ghi "(không có)") và ghi chú Obsidian bản tin. Lệnh in dòng "Nhật ký: …" thì thêm dòng đó vào mục "Dữ liệu" của `ban_tin.md` và chạy lại `C ghep`.
@@ -50,8 +50,8 @@ Mục tiêu: đọc xong trong **3 phút trên điện thoại** (thân bản ti
 ```
 # Phụ lục bản tin [dd/mm]
 ## Kỹ thuật MBB, TCB (bản chữ chart6.py) và giá so với TB20 của các mã khác   ← <MÃ>-6-phien.txt, tb20.txt
-## Thế giới đêm qua – đầy đủ                                                  ← ket_qua_B2.md
-## Dòng vốn ngoại – bản chữ ap_luc_von_ngoai.py                               ← ap_luc.txt, ket_qua_B1.md
+## Thế giới đêm qua – đầy đủ                                                  ← các mục còn lại của ket_qua_B2.md
+## Dòng vốn ngoại – bản chữ ap_luc_von_ngoai.py                               ← ap_luc.txt, mục "Dòng tiền Việt Nam" của ket_qua_B2.md
 ## Chuỗi truyền dẫn – bản chữ chuoi_truyen_dan.py                             ← chuoi.txt
 ## Tin nền tảng mới (mỗi tin một dòng kèm chuỗi tác động)                     ← phu_luc_tu_viet.md
 ## Tin doanh nghiệp không đưa lên thân bản tin                                ← ma/<MÃ>.md

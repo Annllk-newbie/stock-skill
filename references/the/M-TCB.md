@@ -1,6 +1,6 @@
 # M-TCB – Techcombank – phần riêng của mã
 
-Agent M-TCB đọc file này cùng `agent-ma.md` (phần chung), `thu-thap.md`, `nhan.md`.
+Agent M-TCB (phân tích sâu) hoặc agent M (bản tin sáng, cho mọi mã) đọc file này cùng `agent-ma.md` (phần chung), `thu-thap.md`, `nhan.md`.
 
 - **Cổ đông lớn:** Masan Group (MSN), gia đình ông Hồ Hùng Anh; tin về bán tối đa 15% cho nhà đầu tư chiến lược nước ngoài (Reuters 12/10/2026, chưa chính thức) phải theo dõi.
 - **Công ty con, liên kết (mã niêm yết):** Chứng khoán Kỹ Thương TCBS (TCX), Techcom Capital, mảng bảo hiểm của Techcombank.

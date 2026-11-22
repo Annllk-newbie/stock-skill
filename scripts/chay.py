@@ -57,9 +57,10 @@ KE_HOACH = [
     ("04–05 Giá", "BA", "`chay.py <chế độ> gia --phien … --cong-cu …` (mã thoát 2 → DỪNG)"),
     ("07 Đồng bộ và liệt kê vault", "A", "skill dong-bo-obsidian; ghi nhật ký"),
     ("08 Chấm dự báo kỳ trước", "A", "phiên chính (phan-tich-sau.md bước 2); ghi nhật ký"),
-    ("09–10 Agent B1, B2", "B", "agent Haiku đọc thu-thap.md, trang-web.md, nhan.md, the/B1.md|B2.md; song song cùng 14–17; ghi nhật ký từng agent"),
+    ("09 Agent B2", "B", "agent Haiku đọc thu-thap.md, trang-web.md, nhan.md, the/B2.md (agent thu thập duy nhất của bản tin); song song cùng 10; ghi nhật ký"),
+    ("10 Agent M", "B", "MỘT agent Haiku cho mọi mã: thu-thap.md, nhan.md, agent-ma.md (mục Chế độ B), the/M-<MÃ>.md của từng mã; ghi nhật ký"),
     ("11–13 Agent A2, A3, A4", "A", "agent Haiku đọc thu-thap.md, trang-web.md, nhan.md, the/A2..A4.md; song song cùng 14–17 (A4 chỉ bản đầy đủ, bản cập nhật ghi BỎ QUA)"),
-    ("14–17 Agent theo mã", "BA", "agent Haiku đọc thu-thap.md, nhan.md, agent-ma.md, the/M-<MÃ>.md; ghi nhật ký từng agent"),
+    ("14–17 Agent theo mã", "A", "mỗi mã một agent Haiku đọc thu-thap.md, nhan.md, agent-ma.md, the/M-<MÃ>.md; ghi nhật ký từng agent"),
     ("18 Agent A5", "BA", "phiên chính gắn nhãn, gom số chưa ✔ vào can_kiem_chung.md; agent Haiku đọc thu-thap.md, trang-web.md, nhan.md, the/A5.md. A: luôn; B: chỉ khi còn số chưa ✔ (không thì BỎ QUA)"),
     ("19 Gắn nhãn và ghi nhật ký CSV", "BA", "phiên chính, Python (phien-chinh.md, mục bước 18–19); ghi nhật ký"),
     ("20–24 Tính toán", "BA", "`chay.py <chế độ> tinh` (A thêm --kich-ban, --nghi nếu có)"),
@@ -403,8 +404,8 @@ def ghep_phu_luc(cx, t):
     tv = doc_muc(W("phu_luc_tu_viet.md"))
     tu_dong = {
         MAU_PHU_LUC[0]: [W(f"{m}-6-phien.txt") for m in t["bieu_do"]] + [W("tb20.txt")],
-        MAU_PHU_LUC[1]: [W("ket_qua_B2.md")],
-        MAU_PHU_LUC[2]: [W("ap_luc.txt"), W("ket_qua_B1.md")],
+        MAU_PHU_LUC[1]: [("tru", W("ket_qua_B2.md"), "Dòng tiền Việt Nam")],
+        MAU_PHU_LUC[2]: [W("ap_luc.txt"), ("muc", W("ket_qua_B2.md"), "Dòng tiền Việt Nam")],
         MAU_PHU_LUC[3]: [W("chuoi.txt")],
         MAU_PHU_LUC[5]: [W("ma", f"{m}.md") for m in t["ma"]],
         MAU_PHU_LUC[6]: [W("tham_chieu_B2.csv")],
@@ -412,15 +413,21 @@ def ghep_phu_luc(cx, t):
         MAU_PHU_LUC[11]: sorted(glob.glob(W("danh_muc_*.md"))),
         MAU_PHU_LUC[12]: sorted(glob.glob(W("nguon_*.md"))),
     }
-    can_co = [W("ket_qua_B1.md"), W("ket_qua_B2.md")] + [W("ma", f"{m}.md") for m in t["ma"]]
-    thieu = [f for f in can_co if not os.path.isfile(f)]
     phan = [f"# Phụ lục bản tin {dt.date.fromisoformat(t['ngay']).strftime('%d/%m')}"]
     for td in MAU_PHU_LUC:
         noi = []
         if td.startswith("Nhật ký chạy"):
             noi.append(doc_file(cx.NK) or "")
         for f in tu_dong.get(td, []):
-            c = doc_file(f)
+            if isinstance(f, tuple):  # (muc|tru, file, tiêu đề): chỉ lấy / bỏ đúng một mục ## của file
+                kieu, f, ten = f
+                muc = doc_muc(f)
+                c = (muc.get(ten) if kieu == "muc" else
+                     "\n\n".join(f"## {k}\n{v}" for k, v in muc.items() if k != ten) or None) if muc else None
+                if kieu == "tru" and not muc:
+                    c = doc_file(f)
+            else:
+                c = doc_file(f)
             if c:
                 c = "\n".join("###" + l.lstrip("#") if l.startswith("#") else l for l in c.splitlines())
                 noi.append(c if len(tu_dong[td]) == 1 else f"### {os.path.basename(f)}\n{c}")
@@ -433,7 +440,6 @@ def ghep_phu_luc(cx, t):
         phan.append(f"## {td}\n" + ("\n\n".join(x for x in noi if x) or "(không có)"))
     with open(W("phu_luc.md"), "w", encoding="utf-8") as f:
         f.write("\n\n".join(phan) + "\n")
-    return thieu
 
 
 def cmd_ghep(cx):
@@ -456,11 +462,13 @@ def cmd_ghep(cx):
                "Phiên chính viết ghi_chu_dau.md và ban_tin.md theo mẫu trong ban-tin-sang.md trước khi ghép.")
         return 1
     # ghi trước dòng nhật ký của bước 28 để phụ lục chứa cả dòng đó
-    thieu = [f for f in (cx.p("ket_qua_B1.md"), cx.p("ket_qua_B2.md")) + tuple(cx.p("ma", f"{m}.md") for m in t["ma"])
+    thieu = [f for f in (cx.p("ket_qua_B2.md"),) + tuple(cx.p("ma", f"{m}.md") for m in t["ma"])
              if not os.path.isfile(f)]
+    if os.path.isfile(cx.p("ket_qua_B2.md")) and "Dòng tiền Việt Nam" not in doc_muc(cx.p("ket_qua_B2.md")):
+        thieu.append(cx.p("ket_qua_B2.md") + " (thiếu mục '## Dòng tiền Việt Nam')")
     cx.ghi("28 Viết bản tin/báo cáo và phụ lục", "canh-bao" if thieu else "ok",
            ("thiếu file agent: " + ", ".join(os.path.basename(f) for f in thieu)) if thieu else "",
-           "Agent chưa ghi đúng tên file kết quả (ket_qua_<agent>.md, ma/<MÃ>.md): mục đó trong phụ lục ghi (không có)." if thieu else "")
+           "Agent chưa ghi đúng tên file hoặc tên mục kết quả (ket_qua_B2.md, ma/<MÃ>.md): mục đó trong phụ lục ghi (không có)." if thieu else "")
     ghep_phu_luc(cx, t)
     note = os.path.join(cx.DA, "obsidian", "Bản tin", f"{t['ngay']} Bản tin.md")
     os.makedirs(os.path.dirname(note), exist_ok=True)
@@ -560,7 +568,16 @@ def main():
     cx = Ctx(a)
     f = {"bat-dau": cmd_bat_dau, "gia": cmd_gia, "tinh": cmd_tinh, "ghep": cmd_ghep, "luu": cmd_luu,
          "ke-hoach": cmd_ke_hoach}[a.lenh]
-    return f(cx)
+    try:
+        return f(cx)
+    except Exception as e:  # lỗi của chính chay.py: ghi nhật ký để biết đây là lỗi code
+        import traceback
+        tb = traceback.format_exc()
+        try:
+            ghi_dong(cx.NK, f"chay.py {a.lenh}", "loi", f"{type(e).__name__}: {e}", goi_y(tb))
+        except Exception:
+            pass
+        raise
 
 
 if __name__ == "__main__":

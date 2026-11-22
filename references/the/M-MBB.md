@@ -1,6 +1,6 @@
 # M-MBB – Ngân hàng TMCP Quân đội – phần riêng của mã
 
-Agent M-MBB đọc file này cùng `agent-ma.md` (phần chung), `thu-thap.md`, `nhan.md`.
+Agent M-MBB (phân tích sâu) hoặc agent M (bản tin sáng, cho mọi mã) đọc file này cùng `agent-ma.md` (phần chung), `thu-thap.md`, `nhan.md`.
 
 - **Cổ đông lớn:** Viettel, Tân Cảng Sài Gòn, Vietcombank, Tổng công ty Trực thăng Việt Nam (khối Bộ Quốc phòng).
 - **Công ty con, liên kết (mã niêm yết):** Chứng khoán MB (MBS), Bảo hiểm Quân đội MIC (MIG), MB Ageas Life (đối tác Ageas), MCredit, MB Capital, MBV (ngân hàng nhận chuyển giao bắt buộc, trước là OceanBank), chi nhánh/ngân hàng con tại Campuchia, Lào.

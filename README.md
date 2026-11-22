@@ -4,8 +4,8 @@ Code của skill `stock-research-analyzer` (bản tin sáng và phân tích sâu
 
 - `references/` – hướng dẫn, chia theo người đọc (mỗi người chỉ đọc đúng phần của mình):
   - phiên chính: `phien-chinh.md` (điều phối, VND, giá, nhật ký, khi dừng) + `nguyen-tac.md` + `nhan.md` + file của chế độ `ban-tin-sang.md` hoặc `phan-tich-sau.md`;
-  - agent thu thập B1, B2, A2–A5: `thu-thap.md` (quy tắc chung, danh mục) + `trang-web.md` + `nhan.md` + thẻ `the/<tên>.md` (doanh nghiệp tham chiếu ở `the/B2.md`, tìm sự kiện quá khứ ở `the/A2.md`);
-  - agent theo mã: `thu-thap.md` + `nhan.md` + `agent-ma.md` (phần chung) + `the/M-<MÃ>.md` (`trang-web.md` khi cần);
+  - agent thu thập B2 (bản tin sáng; đã gộp B1), A2–A5: `thu-thap.md` (quy tắc chung, danh mục) + `trang-web.md` + `nhan.md` + thẻ `the/<tên>.md` (doanh nghiệp tham chiếu ở `the/B2.md`, tìm sự kiện quá khứ ở `the/A2.md`);
+  - agent theo mã: `thu-thap.md` + `nhan.md` + `agent-ma.md` (phần chung) + `the/M-<MÃ>.md` (`trang-web.md` khi cần). Bản tin sáng: MỘT agent `M` làm cho mọi mã; phân tích sâu: mỗi mã một agent `M-<MÃ>`;
   - agent T: `the/T.md` · agent O: `the/O.md` · tổng hợp: `nguyen-tac.md` + `nhan.md` + `tong-hop.md` · kiểm tra chéo Opus: `kiem-tra-cheo.md`.
   - Một quy tắc chỉ nằm ở MỘT file; file khác nhắc tới thì trỏ sang, không chép lại.
 - `scripts/` (chạy với `--help` để xem tham số):
@@ -58,12 +58,12 @@ Các bước còn lại (VND MCP, agent, viết lời văn, `project_write`, g�
 
 ### Thu thập (Haiku, chạy song song)
 Hướng dẫn: `thu-thap.md` + `trang-web.md` + `nhan.md` + thẻ `the/<tên>.md` (agent theo mã: thêm `agent-ma.md`, `the/M-<MÃ>.md`). Mỗi agent ghi file kết quả của mình, `danh_muc_<agent>.md` và `nguon_<agent>.md` trong `<W>`.
-- **09 Agent B1** (B) – tự doanh, tỷ giá, USD, liên ngân hàng, OMO (cột hằng ngày của `von-ngoai.csv`). Ghi `ket_qua_B1.md`.
-- **10 Agent B2** (B) – tin chung, quốc tế đêm qua, lịch 3 phiên, doanh nghiệp tham chiếu. Ghi `ket_qua_B2.md`, `tham_chieu_B2.csv`.
+- **09 Agent B2** (B; agent thu thập duy nhất của bản tin, đã gộp B1) – dòng tiền Việt Nam (tự doanh, tỷ giá, USD, liên ngân hàng, OMO), tin chung, quốc tế đêm qua, lịch 3 phiên, doanh nghiệp tham chiếu. Ghi `ket_qua_B2.md` (mục `## Dòng tiền Việt Nam`, `## Tin chung`, `## Quốc tế đêm qua`, `## Lịch 3 phiên tới`), `tham_chieu_B2.csv`.
+- **10 Agent M** (B) – MỘT agent làm lần lượt mọi mã theo mục "Chế độ B" của `agent-ma.md`. Ghi `<W>/ma/<MÃ>.md`, `<W>/ma/su_kien_<MÃ>.csv` cho từng mã, `danh_muc_M.md`, `nguon_M.md`.
 - **11 Agent A2** (A) – lịch 10 ngày, sự kiện quá khứ chung, tham chiếu. Ghi `ket_qua_A2.md`, `su_kien_A2.csv`, `tham_chieu_A2.csv`.
 - **12 Agent A3** (A) – tự doanh, ngành, vĩ mô, quốc tế, Fed, ETF, khu vực. Ghi `ket_qua_A3.md` (và `su_kien_A3.csv` nếu có).
 - **13 Agent A4** (chỉ Ađ; Ac ghi BỎ QUA) – NHNN, trái phiếu, đầu tư công và FDI. Ghi `ket_qua_A4.md`.
-- **14–17 Agent M-MBB, M-TCB, M-CTG, M-HPG** (B và A) – tự gọi VND phần theo mã. Ghi `<W>/ma/<MÃ>.md`, `<W>/ma/su_kien_<MÃ>.csv`.
+- **14–17 Agent M-MBB, M-TCB, M-CTG, M-HPG** (chỉ A; mỗi mã một agent) – tự gọi VND phần theo mã. Ghi `<W>/ma/<MÃ>.md`, `<W>/ma/su_kien_<MÃ>.csv`.
 - **18 Agent A5** – đọc `<W>/can_kiem_chung.md`, tìm nguồn thứ hai, ghi `<W>/kiem_chung.md`. A: luôn chạy; B: chỉ khi còn số chưa ✔, không thì BỎ QUA.
 - **19 Gắn nhãn và ghi nhật ký CSV** – phiên chính, Python. Thêm dòng vào `<W>/du-an/data/kiem-chung.csv`, `von-ngoai.csv`, `tham-chieu.csv`, `<W>/du-an/su-kien-nen-tang.csv` (A thêm `<W>/du-an/<MÃ>/su-kien.csv`).
 

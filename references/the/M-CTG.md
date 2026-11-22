@@ -1,6 +1,6 @@
 # M-CTG – VietinBank – phần riêng của mã
 
-Agent M-CTG đọc file này cùng `agent-ma.md` (phần chung), `thu-thap.md`, `nhan.md`.
+Agent M-CTG (phân tích sâu) hoặc agent M (bản tin sáng, cho mọi mã) đọc file này cùng `agent-ma.md` (phần chung), `thu-thap.md`, `nhan.md`.
 
 - **Cổ đông lớn:** Ngân hàng Nhà nước (chi phối), MUFG (Nhật Bản), IFC.
 - **Công ty con, liên kết (mã niêm yết):** Chứng khoán VietinBank (CTS), Bảo hiểm VietinBank (VBI), VietinBank Capital, VietinBank Leasing.

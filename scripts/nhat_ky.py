@@ -7,7 +7,7 @@ Trạng thái: OK · CẢNH BÁO (chạy được nhưng thiếu/◐) · LỖI (
 Cách dùng (mặc định file research/nhat-ky-chay.txt, đổi bằng --file):
     python nhat_ky.py bat-dau --tieu-de "Bản tin sáng 2026-11-24" --phien-ban "dc9be80 2026-11-22"
     python nhat_ky.py ghi --buoc "02 VND health" --trang-thai ok --chi-tiet "16 công cụ"
-    python nhat_ky.py ghi --buoc "06 Agent B1" --trang-thai loi --chi-tiet "<nguyên văn lỗi>"
+    python nhat_ky.py ghi --buoc "09 Agent B2" --trang-thai loi --chi-tiet "<nguyên văn lỗi>"
     python nhat_ky.py chay --buoc "04 gia_vnd.py" --dung-khi-ma 2 -- python scripts/gia_vnd.py ... > ket-qua.json
     python nhat_ky.py tom-tat            # in tóm tắt: số bước theo trạng thái + mọi dòng không OK
 

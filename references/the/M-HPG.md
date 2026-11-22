@@ -1,6 +1,6 @@
 # M-HPG – Tập đoàn Hòa Phát – phần riêng của mã
 
-Agent M-HPG đọc file này cùng `agent-ma.md` (phần chung), `thu-thap.md`, `nhan.md`.
+Agent M-HPG (phân tích sâu) hoặc agent M (bản tin sáng, cho mọi mã) đọc file này cùng `agent-ma.md` (phần chung), `thu-thap.md`, `nhan.md`.
 
 - **Cổ đông lớn, nội bộ:** ông Trần Đình Long và gia đình (giao dịch của ông Trần Vũ Minh đang theo dõi).
 - **Công ty con, dự án:** Khu liên hợp Dung Quất 1 và 2, nhà máy thép ray Dung Quất, mỏ quặng ở Úc, Hòa Phát Nông nghiệp, điện máy gia dụng, khu công nghiệp.

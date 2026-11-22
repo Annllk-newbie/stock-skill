@@ -16,20 +16,21 @@ Mọi việc script làm bằng `C` = `python <S>/scripts/chay.py <ban-tin|sau|s
 ## Phân công mô hình (quy tắc của người dùng)
 Mọi việc thu thập và tải dữ liệu dùng Haiku; Sonnet chỉ tổng hợp, phân tích, điều phối; kiểm tra cuối cùng là Opus.
 - Phiên chính (Sonnet): điều phối, chạy `chay.py`, gọi VND MCP phần chung, gắn nhãn, lưu, gửi. Không tự đọc web.
-- Agent T: Haiku, effort low. Thu thập B1, B2, A2, A3, A4, kiểm chứng A5, agent theo mã M-<MÃ>: Haiku, effort medium.
+- Agent T: Haiku, effort low. Thu thập B2, A2, A3, A4, kiểm chứng A5, agent theo mã (M, M-<MÃ>): Haiku, effort medium.
 - Chỉ phân tích sâu: tổng hợp (Sonnet, effort high), kiểm tra chéo (Opus, effort medium, **bắt buộc**), agent O (Sonnet, effort low).
 
 **Số agent mỗi lần chạy (cố định, không tự thêm):**
-- Bản tin sáng: **7** = T · B1, B2 · một agent theo mã cho mỗi mã; thêm A5 chỉ khi còn số quan trọng chưa ✔ (tối đa 8).
+- Bản tin sáng: **3** = T · B2 · M (một agent theo mã làm cho mọi mã); thêm A5 chỉ khi còn số quan trọng chưa ✔ (tối đa 4).
 - Phân tích sâu bản đầy đủ: **12** = T · A2, A3, A4 · agent theo mã · A5 · tổng hợp · kiểm tra chéo · O. Sửa lỗi sau kiểm tra chéo gửi lại cho chính agent tổng hợp (SendMessage), không tạo agent mới.
 - Phân tích sâu bản cập nhật: **11** (như trên, bỏ A4).
-(Số trên tính với 4 mã; thêm mã thì thêm một agent theo mã.) Cuối báo cáo ghi một dòng: mô hình nào đã thu thập, tổng hợp, kiểm tra.
+(Phân tích sâu tính với 4 mã; thêm mã thì thêm một agent theo mã. Bản tin sáng luôn một agent M.) Cuối báo cáo ghi một dòng: mô hình nào đã thu thập, tổng hợp, kiểm tra.
 
 ## Giao việc (lời giao việc mẫu; không chép quy tắc vào)
 Mọi lời giao việc gồm: tên agent · câu "Đọc <các file dưới> trong `<S>/references/` rồi làm đúng việc của bạn" · tham số chung: phiên cần lấy, ngày lần chạy trước, danh sách mã, `<W>`, đường dẫn `<W>/du-an/data/TOM-TAT.md`.
 - **T:** `the/T.md`; thêm chế độ (B/A), `<S>`.
-- **B1, B2, A2, A3, A4, A5:** `thu-thap.md`, `trang-web.md`, `nhan.md`, `the/<tên>.md` (A2 thêm mục tham chiếu của `the/B2.md`; thẻ tự ghi). B2 thêm Brent và % từ VND, sự kiện F1/F2 trong lịch 24 giờ qua; A2, A3 thêm mức chạy.
-- **M-<MÃ>:** `thu-thap.md`, `nhan.md`, `agent-ma.md`, `the/M-<MÃ>.md`; thêm chế độ (B / A-đầy đủ / A-cập nhật), giá đóng cửa và nhãn VND của mã, câu "VND hoạt động (health ok)".
+- **B2, A2, A3, A4, A5:** `thu-thap.md`, `trang-web.md`, `nhan.md`, `the/<tên>.md` (A2 thêm mục tham chiếu của `the/B2.md`; thẻ tự ghi). B2 thêm Brent và % từ VND, sự kiện F1/F2 trong lịch 24 giờ qua; A2, A3 thêm mức chạy.
+- **M (bản tin sáng, mọi mã):** `thu-thap.md`, `nhan.md`, `agent-ma.md` (mục "Chế độ B"), `the/M-<MÃ>.md` của từng mã; thêm danh sách mã, giá đóng cửa và nhãn VND của từng mã, câu "VND hoạt động (health ok)".
+- **M-<MÃ> (phân tích sâu):** `thu-thap.md`, `nhan.md`, `agent-ma.md`, `the/M-<MÃ>.md`; thêm chế độ (A-đầy đủ / A-cập nhật), giá đóng cửa và nhãn VND của mã, câu "VND hoạt động (health ok)".
 - **Tổng hợp, kiểm tra chéo, O:** xem `phan-tich-sau.md`.
 
 ## VND MCP (nguồn giá duy nhất; phiên chính làm trước khi giao việc)
@@ -54,7 +55,7 @@ Mọi lời giao việc gồm: tên agent · câu "Đọc <các file dưới> tr
 
 ## Gắn nhãn, A5 và ghi nhật ký số liệu (bước 18–19)
 Sau khi các agent thu thập xong: gắn nhãn theo `nhan.md` (giá và chỉ số VND đã có nhãn); gom số quan trọng chưa ✔ vào `<W>/can_kiem_chung.md` (mỗi dòng: mục, số, nguồn hiện có) rồi gọi A5 theo chế độ (kết quả ở `<W>/kiem_chung.md`, cập nhật nhãn theo đó). Rồi ghi thêm dòng vào các file nhật ký số liệu (cột ở mục dưới) trong `<W>/du-an/` bằng Python, chỉ thêm dòng:
-- `data/von-ngoai.csv`: khối ngoại toàn sàn (VND), Brent, vàng (VND), các cột của `ket_qua_B1.md` (bản tin) và số Mỹ/Fed của `ket_qua_B2.md`/`ket_qua_A3.md` (DXY, lợi suất, breakeven, VIX, xác suất Fed).
+- `data/von-ngoai.csv`: khối ngoại toàn sàn (VND), Brent, vàng (VND), các cột ở mục "Dòng tiền Việt Nam" của `ket_qua_B2.md` (bản tin) và số Mỹ/Fed của `ket_qua_B2.md`/`ket_qua_A3.md` (DXY, lợi suất, breakeven, VIX, xác suất Fed).
 - `data/kiem-chung.csv`: mọi số quan trọng kèm nhãn cuối cùng.
 - `data/tham-chieu.csv`: dòng của `tham_chieu_B2.csv` hoặc `tham_chieu_A2.csv` (bỏ dòng trùng).
 - `su-kien-nen-tang.csv`: tin F1–F7 mới (từ `ket_qua_A3.md`, `ket_qua_A4.md`; bản tin sáng: tin chung của B2 thuộc nhóm F) kèm chuỗi tác động.
@@ -72,7 +73,7 @@ Mỗi bước một dòng trong `<W>/nhat-ky-chay.txt`. `N` = `python <S>/script
 - `chay.py` tự ghi mọi bước script bên trong (01, 04, 05, 20–24, 28, 29): không ghi lại.
 - Script chạy riêng: `N chay --buoc "<tên bước>" -- python <S>/scripts/<script>.py …` (chuyển hướng `>` đặt sau cùng như bình thường).
 - Việc không phải script (VND MCP, agent, `project_write`, SendUserFile, PushNotification): làm xong thì `N ghi --buoc "<tên bước>" --trang-thai <ok|canh-bao|loi|bo-qua|dung> --chi-tiet "<ngắn; khi lỗi chép NGUYÊN VĂN thông báo lỗi>"`. Agent trả lời đủ file → ok; thiếu mục hoặc có số ⊘ → canh-bao (ghi thiếu gì); lỗi hoặc không ghi ra file → loi. Bước cố ý không làm (A5 khi mọi số đã ✔, A4 ở bản cập nhật) → bo-qua kèm lý do.
-- **Tên bước cố định** (giữ nguyên chữ và số; bước không có ở chế độ đó thì bỏ): `01 Tải code GitHub` · `02 VND health và công cụ` · `03 VND lịch, giá, chỉ số, khối ngoại sàn` · `04 gia_vnd.py` · `05 kiem_tra_du_lieu.py` · `06 Agent T` · `07 Đồng bộ và liệt kê vault` · `08 Chấm dự báo kỳ trước` · `09 Agent B1` · `10 Agent B2` · `11 Agent A2` · `12 Agent A3` · `13 Agent A4` · `14 Agent M-MBB` · `15 Agent M-TCB` · `16 Agent M-CTG` · `17 Agent M-HPG` · `18 Agent A5` · `19 Gắn nhãn và ghi nhật ký CSV` · `20 ap_luc_von_ngoai.py` · `21 chuoi_truyen_dan.py` · `22 forecast6/chart6 MBB` · `23 forecast6/chart6 TCB` · `24 chay_sau.py` · `25 Agent tổng hợp` · `26 Kiểm tra chéo Opus` · `27 Agent O` · `28 Viết bản tin/báo cáo và phụ lục` · `29 nen_du_lieu.py` · `30 Lưu vào dự án` · `31 Gửi người dùng`. Thêm mã vào danh sách theo dõi thì thêm bước `Agent M-<MÃ>` ngay sau mã cuối.
+- **Tên bước cố định** (giữ nguyên chữ và số; bước không có ở chế độ đó thì bỏ): `01 Tải code GitHub` · `02 VND health và công cụ` · `03 VND lịch, giá, chỉ số, khối ngoại sàn` · `04 gia_vnd.py` · `05 kiem_tra_du_lieu.py` · `06 Agent T` · `07 Đồng bộ và liệt kê vault` · `08 Chấm dự báo kỳ trước` · `09 Agent B2` · `10 Agent M` (bản tin sáng) · `11 Agent A2` · `12 Agent A3` · `13 Agent A4` · `14 Agent M-MBB` · `15 Agent M-TCB` · `16 Agent M-CTG` · `17 Agent M-HPG` · `18 Agent A5` · `19 Gắn nhãn và ghi nhật ký CSV` · `20 ap_luc_von_ngoai.py` · `21 chuoi_truyen_dan.py` · `22 forecast6/chart6 MBB` · `23 forecast6/chart6 TCB` · `24 chay_sau.py` · `25 Agent tổng hợp` · `26 Kiểm tra chéo Opus` · `27 Agent O` · `28 Viết bản tin/báo cáo và phụ lục` · `29 nen_du_lieu.py` · `30 Lưu vào dự án` · `31 Gửi người dùng`. Thêm mã vào danh sách theo dõi thì thêm bước `Agent M-<MÃ>` ngay sau mã cuối.
 - `C ghep` đưa nguyên văn nhật ký vào cuối phụ lục/báo cáo và in dòng "Nhật ký: …" khi có bước không OK: thêm dòng đó vào mục "Dữ liệu". Bước 30–31 xảy ra sau khi ghép: lỗi thì đưa dòng đó vào câu trả lời cuối.
 - Nhật ký ghi "LỖI CODE của skill" → mục "Khi code mới lỗi" của SKILL.md.
 
