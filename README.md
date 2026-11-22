@@ -81,21 +81,21 @@ Hướng dẫn: PHẦN 2 `thu-thap.md` (agent theo mã: `agent-ma.md`). Mỗi ag
 - **Vault Obsidian trên máy tính** (`Documents\Data\Stock data`): kho lưu trữ lâu dài, đồng bộ bằng skill `dong-bo-obsidian`.
 - **`<W>` trong phiên chạy:** tạm thời, mất khi phiên kết thúc; cái gì cần giữ phải qua bước 30.
 
-## Bản ổn định (tag `on-dinh`)
+## Bản ổn định (nhánh `on-dinh`)
 
-- Tag `on-dinh` trỏ vào bản code đã chạy được; mỗi lần nâng thì thêm một tag có ngày (`on-dinh-yyyy-mm-dd`) để quay lại được bản cũ hơn nữa.
-- **Tự quay về:** lần chạy gặp lỗi code (nhật ký ghi "LỖI CODE của skill" – lỗi cú pháp, sai tham số, thiếu hàm…) thì làm theo mục "Khi code mới lỗi" của SKILL.md: chép nhật ký sang `research/nhat-ky-ban-moi.txt`, chuyển bản clone sang tag `on-dinh`, làm lại lần chạy theo hướng dẫn của bản đó, báo rõ đã dùng bản ổn định. Lỗi dữ liệu hay VND không phải lỗi code: không quay về.
+- Nhánh `on-dinh` trỏ vào bản code đã chạy được. Không ai commit thẳng vào nhánh này; chỉ dời nó tới một commit của `main`. (Dùng nhánh thay cho tag vì phiên làm việc không được đẩy tag lên GitHub.)
+- **Tự quay về:** lần chạy gặp lỗi code (nhật ký ghi "LỖI CODE của skill" – lỗi cú pháp, sai tham số, thiếu hàm…) thì làm theo mục "Khi code mới lỗi" của SKILL.md: chép nhật ký sang `research/nhat-ky-ban-moi.txt`, chuyển bản clone sang `on-dinh`, làm lại lần chạy theo hướng dẫn của bản đó, báo rõ đã dùng bản ổn định. Lỗi dữ liệu hay VND không phải lỗi code: không quay về.
   ```bash
-  git -C research/skill fetch -q --depth 1 origin tag on-dinh && git -C research/skill checkout -q on-dinh
+  git -C research/skill fetch -q --depth 1 origin on-dinh && git -C research/skill checkout -q FETCH_HEAD
   ```
 - **Tự ghi bản chạy tốt:** `chay.py … luu` thấy nhật ký không có dòng LỖI/DỪNG nào thì thêm commit đang chạy vào `data/ban-chay-tot.txt` trong dự án.
-- **Nâng tag (Claude làm mỗi khi sửa kho, trước commit đầu tiên):** đọc dòng cuối của `claude/chung-khoan/data/ban-chay-tot.txt`; commit đó mới hơn `on-dinh` thì
+- **Dời `on-dinh` (Claude làm mỗi khi sửa kho, trước commit đầu tiên):** đọc dòng cuối của `claude/chung-khoan/data/ban-chay-tot.txt`; commit đó khác và mới hơn `on-dinh` thì
   ```bash
-  git tag -f on-dinh <commit> && git tag on-dinh-<ngày> <commit> && git push -f origin on-dinh on-dinh-<ngày>
+  git fetch --depth=50 origin main on-dinh && git push -f origin <commit>:refs/heads/on-dinh
   ```
-  Không bao giờ gắn `on-dinh` vào commit chưa có trong `ban-chay-tot.txt`, trừ lần gắn đầu tiên (ghi rõ ở danh sách dưới).
+  rồi thêm một dòng vào lịch sử dưới đây. Không bao giờ dời `on-dinh` tới commit chưa có trong `ban-chay-tot.txt`, trừ lần đặt đầu tiên.
 
-Lịch sử tag:
-- `on-dinh-2026-11-22` → `dc9be80` – gắn TẠM: bản VND-only cuối cùng trước khi thêm nhật ký và chay.py. Chưa có lần chạy thật trọn vẹn trên bản này (bản chạy thật gần nhất, 3ef948d, còn lấy giá KBS/Vietcap nên không dùng làm bản ổn định được). Sẽ được thay bằng commit đầu tiên ghi trong `ban-chay-tot.txt`.
+Lịch sử `on-dinh` (mới nhất ở cuối):
+- 2026-11-22 → `dc9be80` – đặt TẠM: bản chỉ lấy giá từ VND cuối cùng trước khi thêm nhật ký và chay.py. Chưa có lần chạy thật trọn vẹn trên bản này (bản chạy thật gần nhất, `3ef948d`, còn lấy giá KBS/Vietcap nên không dùng làm bản ổn định được). Sẽ được thay bằng commit đầu tiên ghi trong `ban-chay-tot.txt`.
 
 Mỗi thay đổi là một commit có ghi lý do. Muốn quay lại bản trước: `git revert`. Đổi bước, thêm script hay đổi file đầu vào/đầu ra thì sửa luôn sơ đồ này và danh sách tên bước trong PHẦN 1 của `thu-thap.md`.
