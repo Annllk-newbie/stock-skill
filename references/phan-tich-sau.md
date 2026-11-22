@@ -83,7 +83,7 @@ Bạn là agent TỔNG HỢP VÀ PHÂN TÍCH. Dữ liệu đã được thu th�
 
 
 ### Bước 2: Dữ liệu giá và chu kỳ đo được
-Cần chuỗi giá ngày dạng CSV với cột `date,open,high,low,close,volume`. Với các mã theo dõi, đó là `research/gia/gia_<MÃ>_ctck.csv` do `gia_vnd.py` tạo (lịch sử trong dự án + phiên mới từ VND) (chỉ số chung: `gia_VNINDEX_ctck.csv`). Với mã khác hoặc khi VND lỗi, nguồn theo thứ tự: file người dùng gửi → file giá trong dự án → bảng giá lịch sử trên trang ưu tiên → trang dữ liệu công khai khác. Ưu tiên giá **đã điều chỉnh** cổ tức/chia tách. Lấy luôn dữ liệu chỉ số chung (VN-Index hoặc chỉ số tương ứng) cùng khoảng thời gian, để biết cổ phiếu có đang chỉ đi theo cả thị trường hay không.
+Cần chuỗi giá ngày dạng CSV với cột `date,open,high,low,close,volume`. Với các mã theo dõi, đó là `research/gia/gia_<MÃ>_ctck.csv` do `gia_vnd.py` tạo từ lịch sử trong dự án cộng phiên mới từ VND (chỉ số chung: `gia_VNINDEX_ctck.csv`). Với mã khác hoặc khi VND lỗi, nguồn theo thứ tự: file người dùng gửi → file giá trong dự án → bảng giá lịch sử trên trang ưu tiên → trang dữ liệu công khai khác. Ưu tiên giá **đã điều chỉnh** cổ tức/chia tách. Lấy luôn dữ liệu chỉ số chung (VN-Index hoặc chỉ số tương ứng) cùng khoảng thời gian, để biết cổ phiếu có đang chỉ đi theo cả thị trường hay không.
 
 **Lấy bao nhiêu năm:** mặc định **5 năm** nếu có. Quy tắc là phải có ít nhất 5–6 chu kỳ hoàn chỉnh, và đủ nhiều năm để so sánh các năm với nhau:
 
