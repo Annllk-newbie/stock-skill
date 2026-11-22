@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Giá cổ phiếu và chỉ số chỉ từ VND MCP (thay lay_gia_cty_ck.py, bỏ KBS và Vietcap từ 22/11/2026).
+"""Giá cổ phiếu và chỉ số chỉ từ VND MCP.
 
 VND MCP không có lệnh lấy lịch sử dài, nên lịch sử 6 năm lấy từ bản lưu trong dự án
 (data/<MÃ>.csv, data/VNINDEX.csv, data/VN30.csv – agent T tải về), rồi nối các phiên mới
@@ -28,12 +28,11 @@ một lần gọi (kết quả không có trường mã).
 
 Kết quả: gia_<MÃ>_ctck.csv, gia_VNINDEX_ctck.csv, gia_VN30_ctck.csv trong --out-dir (giữ tên cũ để
 các script khác không phải đổi; cột date,open,high,low,close,volume, nghìn đồng, đã điều chỉnh)
-và JSON ra stdout (cấu trúc như lay_gia_cty_ck.py: tom_tat, ma, chi_so, thêm dieu_chinh, vnd).
+và JSON ra stdout (tom_tat, ma, chi_so, dieu_chinh, vnd, dung, ly_do_dung).
 
-Nhãn: VND là dữ liệu sàn qua công ty chứng khoán. Theo quyết định của người dùng (22/11/2026),
-số giá/chỉ số VND qua được kiểm tra nội tại là ✔ (một nguồn cấp cao). Không qua thì ✖ và ghi lý do.
+Nhãn: VND là dữ liệu sàn qua công ty chứng khoán. Số giá/chỉ số VND qua được kiểm tra nội tại là ✔ (một nguồn cấp cao). Không qua thì ✖ và ghi lý do.
 Có mã hoặc chỉ số nào không ✔ (✖ hay ⊘) thì JSON có "dung": true, "ly_do_dung", và script thoát mã 2:
-phiên chính DỪNG cả lần chạy (quy tắc người dùng 22/11/2026).
+phiên chính DỪNG cả lần chạy.
 Điều chỉnh giá: nếu giá tham chiếu (basicPrice) của phiên mới khác giá đóng cửa phiên trước trong
 lịch sử, coi là có sự kiện quyền (chia cổ tức, phát hành) và nhân toàn bộ lịch sử trước đó theo tỷ lệ
 basicPrice / đóng cửa trước, khối lượng chia theo tỷ lệ đó. Ghi rõ vào dieu_chinh.
@@ -103,7 +102,7 @@ def main():
     a = ap.parse_args()
     os.makedirs(a.out_dir, exist_ok=True)
     vnd = json.load(open(a.vnd, encoding="utf-8"))
-    kq = {"phien": a.phien, "nguon": "VND MCP (một nguồn cấp cao; KBS và Vietcap đã bỏ từ 22/11/2026)",
+    kq = {"phien": a.phien, "nguon": "VND MCP",
           "ma": {}, "chi_so": {}, "vnd": {"health": vnd.get("health"), "thong_bao": list(vnd.get("thong_bao", []))}}
     tim_thong_bao({k: v for k, v in vnd.items() if k != "thong_bao"}, kq["vnd"]["thong_bao"])
 
@@ -204,7 +203,7 @@ def main():
                             "cao": cuoi["high"], "thap": cuoi["low"], "khoi_luong_cp": int(cuoi["volume"]),
                             "gia_tri_ty_dong_gom_thoa_thuan": round(float(x["accumulatedVal"]) / 1e9, 1) if x.get("accumulatedVal") else None,
                             "canh_bao": canh, "file": p}
-    # Quy tắc người dùng 22/11/2026: không lấy được giá thì DỪNG cả lần chạy (không lấy giá từ web).
+    # Không lấy được giá thì DỪNG cả lần chạy (không lấy giá từ web).
     ly_do = [f"{m}: {v['nhan']} – " + "; ".join(v["canh_bao"]) for m, v in kq["ma"].items() if v["nhan"] != "✔"]
     ly_do += [f"{c}: {v['nhan']} – " + "; ".join(v.get("canh_bao") or [v.get("ghi_chu", "")]) for c, v in kq["chi_so"].items() if v["nhan"] != "✔"]
     if "VNINDEX" not in kq["chi_so"]:
