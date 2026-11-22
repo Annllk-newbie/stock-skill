@@ -2,7 +2,7 @@
 """Kiểm tra file giá TRƯỚC khi phân tích, để các lần chạy dùng cùng một bộ dữ liệu sạch.
 
 Cách dùng:
-    python kiem_tra_du_lieu.py MBB=data/MBB.csv TCB=data/TCB.csv CTG=data/CTG.csv HPG=data/HPG.csv SSI=data/SSI.csv \
+    python kiem_tra_du_lieu.py MBB=data/MBB.csv TCB=data/TCB.csv CTG=data/CTG.csv HPG=data/HPG.csv \
         --tham-chieu MBB=19.90 HPG=21.15 --bien-do 0.07
 
 Kiểm tra từng mã:
