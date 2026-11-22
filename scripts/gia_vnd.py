@@ -32,6 +32,8 @@ và JSON ra stdout (cấu trúc như lay_gia_cty_ck.py: tom_tat, ma, chi_so, th�
 
 Nhãn: VND là dữ liệu sàn qua công ty chứng khoán. Theo quyết định của người dùng (22/11/2026),
 số giá/chỉ số VND qua được kiểm tra nội tại là ✔ (một nguồn cấp cao). Không qua thì ✖ và ghi lý do.
+Có mã hoặc chỉ số nào không ✔ (✖ hay ⊘) thì JSON có "dung": true, "ly_do_dung", và script thoát mã 2:
+phiên chính DỪNG cả lần chạy (quy tắc người dùng 22/11/2026).
 Điều chỉnh giá: nếu giá tham chiếu (basicPrice) của phiên mới khác giá đóng cửa phiên trước trong
 lịch sử, coi là có sự kiện quyền (chia cổ tức, phát hành) và nhân toàn bộ lịch sử trước đó theo tỷ lệ
 basicPrice / đóng cửa trước, khối lượng chia theo tỷ lệ đó. Ghi rõ vào dieu_chinh.
@@ -202,7 +204,16 @@ def main():
                             "cao": cuoi["high"], "thap": cuoi["low"], "khoi_luong_cp": int(cuoi["volume"]),
                             "gia_tri_ty_dong_gom_thoa_thuan": round(float(x["accumulatedVal"]) / 1e9, 1) if x.get("accumulatedVal") else None,
                             "canh_bao": canh, "file": p}
+    # Quy tắc người dùng 22/11/2026: không lấy được giá thì DỪNG cả lần chạy (không lấy giá từ web).
+    ly_do = [f"{m}: {v['nhan']} – " + "; ".join(v["canh_bao"]) for m, v in kq["ma"].items() if v["nhan"] != "✔"]
+    ly_do += [f"{c}: {v['nhan']} – " + "; ".join(v.get("canh_bao") or [v.get("ghi_chu", "")]) for c, v in kq["chi_so"].items() if v["nhan"] != "✔"]
+    if "VNINDEX" not in kq["chi_so"]:
+        ly_do.append("VNINDEX: không có số VND")
+    kq["dung"] = bool(ly_do)
+    kq["ly_do_dung"] = ly_do
     json.dump(kq, sys.stdout, ensure_ascii=False, indent=1)
+    if ly_do:
+        sys.exit(2)
 
 
 if __name__ == "__main__":
