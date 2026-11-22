@@ -52,7 +52,7 @@ KE_HOACH = [
     ("01 Tải code GitHub", "BA", "git clone (mục 0 SKILL.md) rồi `chay.py <chế độ> bat-dau`"),
     ("02 VND health và công cụ", "BA", "phiên chính: ToolSearch `mcp__VND__`, `mcp__VND__health`; ghi nhật ký"),
     ("06 Agent T", "BA", "agent Haiku (lời giao việc ở ban-tin-sang.md), song song với 02–03; ghi nhật ký"),
-    ("03 VND lịch, giá, chỉ số, khối ngoại sàn", "BA", "phiên chính: gọi VND theo mục 1.5 SKILL.md, ghi <W>/gia/vnd.json; ghi nhật ký"),
+    ("03 VND lịch, giá, chỉ số, khối ngoại sàn", "BA", "phiên chính: gọi VND theo mục “Nguồn VND (MCP)” SKILL.md, ghi <W>/gia/vnd.json; ghi nhật ký"),
     ("04–05 Giá", "BA", "`chay.py <chế độ> gia --phien … --cong-cu …` (mã thoát 2 → DỪNG)"),
     ("07 Đồng bộ và liệt kê vault", "A", "skill dong-bo-obsidian; ghi nhật ký"),
     ("08 Chấm dự báo kỳ trước", "A", "phiên chính (phan-tich-sau.md bước 2); ghi nhật ký"),
@@ -459,6 +459,17 @@ def cmd_luu(cx):
         doi.append("NHAC-DONG-BO.md")
     if not cu:
         cx.ghi("29 nen_du_lieu.py", "canh-bao", "không có ảnh chụp dự án lúc bắt đầu (lệnh gia chưa chạy?) – liệt kê MỌI file")
+    # Bản chạy tốt: lần chạy không có dòng LỖI/DỪNG nào → ghi lại commit để có thể nâng tag on-dinh lên đó
+    dong = [l.split(" | ")[1] for l in open(cx.NK, encoding="utf-8") if l[:2].isdigit()] if os.path.isfile(cx.NK) else []
+    if dong and not {"LỖI", "DỪNG"} & set(dong) and t.get("phien_ban"):
+        f = os.path.join(cx.DA, "data", "ban-chay-tot.txt")
+        cu_dong = [l for l in (doc_file(f) or "").splitlines() if l.strip() and not l.startswith("#")]
+        cu_dong.append(f"{t['phien_ban']} · {t['ngay']} · {t['che_do']}")
+        with open(f, "w", encoding="utf-8") as fo:
+            fo.write("# Commit của skill đã chạy trọn không lỗi (mới nhất ở cuối). Claude nâng tag on-dinh lên dòng cuối khi sửa kho.\n"
+                     + "\n".join(cu_dong[-10:]) + "\n")
+        if "data/ban-chay-tot.txt" not in doi:
+            doi.append("data/ban-chay-tot.txt")
     ds = [{"local_path": os.path.abspath(os.path.join(cx.DA, k)), "path": f"{DU_AN_GOC}/{k}"} for k in doi]
     with open(cx.p("can-luu.json"), "w", encoding="utf-8") as f:
         json.dump(ds, f, ensure_ascii=False, indent=1)

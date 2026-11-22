@@ -26,11 +26,18 @@ MAC_DINH = os.path.join("research", "nhat-ky-chay.txt")
 TRANG_THAI = {"ok": "OK", "canh-bao": "CẢNH BÁO", "loi": "LỖI", "bo-qua": "BỎ QUA", "dung": "DỪNG"}
 
 # (mẫu lỗi, gợi ý) – dòng đầu tiên khớp được dùng. Thêm mẫu mới khi gặp lỗi mới.
+LOI_CODE = ("LỖI CODE của skill (không phải lỗi dữ liệu): không tự sửa code trong lần chạy; chuyển sang bản ổn định theo "
+            "mục 'Khi code mới lỗi' của SKILL.md, rồi gửi dòng này cho Claude để sửa trên GitHub.")
+
 GOI_Y = [
+    (r"SyntaxError|IndentationError|NameError|AttributeError|ImportError: cannot import|"
+     r"No module named '(?:nhat_ky|common|indicators|cycles|chay|gia_vnd|forecast6|chart6|kiem_dinh)'|"
+     r"unrecognized arguments|the following arguments are required|invalid choice|"
+     r"can't open file '[^']*research/skill", LOI_CODE),
     (r"ModuleNotFoundError: No module named '([\w.]+)'",
      "Thiếu thư viện {0}: chạy `pip install {0} --break-system-packages` rồi chạy lại bước này."),
     (r"URL_NOT_ON_ALLOWLIST",
-     "WebFetch chặn URL gõ tay: WebSearch trước rồi fetch đúng link trả về (mục 1.2 SKILL.md)."),
+     "WebFetch chặn URL gõ tay: WebSearch trước rồi fetch đúng link trả về (mục “Trang web ưu tiên” SKILL.md)."),
     (r"throttl|429|rate limit|too many requests",
      "Bị giới hạn tần suất: chờ 20 giây rồi gọi lại MỘT lần."),
     (r"timed? ?out|timeout|hết thời gian",
@@ -48,7 +55,7 @@ GOI_Y = [
     (r"No such file|FileNotFoundError|không có file|không tìm thấy|not found",
      "Thiếu file: kiểm đường dẫn trong lệnh và agent T đã tải file đó chưa (dòng JSON `da_luu`)."),
     (r"Permission denied|403|Forbidden",
-     "Bị chặn quyền truy cập: trang/thư mục không cho đọc – đổi nguồn (mục 1.2) hoặc kiểm quyền thư mục."),
+     "Bị chặn quyền truy cập: trang/thư mục không cho đọc – đổi nguồn (mục “Trang web ưu tiên”) hoặc kiểm quyền thư mục."),
     (r"Traceback|Error",
      "Lỗi trong script: chạy riêng lệnh này để xem lỗi đầy đủ, rồi gửi dòng nhật ký này cho Claude để sửa trên GitHub."),
 ]

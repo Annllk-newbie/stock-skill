@@ -18,7 +18,7 @@ Agent theo mã thay cho: T1 (tin doanh nghiệp) của B2 và A2, phần sự ki
 - Chỉ chế độ A-đầy đủ: `get_ratios` (q `code:<MÃ>~ratioCode:PRICE_TO_EARNINGS,PRICE_TO_BOOK~reportDate:gte:<1 năm trước>`, sort `reportDate:asc`, size 300) → ghi P/E, P/B nhỏ nhất / trung vị / lớn nhất 1 năm; `get_company_personnel` (size 30) → chỉ ghi dòng có `updatedDate` hoặc `effectiveDate` trong 30 ngày qua (bỏ dòng trùng tên cũ).
 - Mã của hệ sinh thái có niêm yết (cột "Mã niêm yết" bên dưới): `get_stock_price_by_date` gộp một lần gọi, ghi % thay đổi; chỉ đưa vào "Hệ sinh thái" khi |%| ≥ 3 hoặc có tin.
 
-**2. Tin trên web** (WebSearch rồi WebFetch link kết quả, như mục 1.2 của SKILL.md). Chỉ tin đăng sau lần chạy trước (đã có trong `TOM-TAT.md` thì bỏ). Tối đa: chế độ B 6 tin, A-cập nhật 8 tin, A-đầy đủ 12 tin. Thứ tự ưu tiên: (a) tin của chính doanh nghiệp; (b) tin của hệ sinh thái có kênh ảnh hưởng rõ tới mã; (c) phần ngành riêng của mã. Mỗi tin: ngày · tin (1 câu) · thuộc nhóm (a/b/c) · kênh ảnh hưởng (với b, c) · nhãn · nguồn 1 · nguồn 2.
+**2. Tin trên web** (WebSearch rồi WebFetch link kết quả, như mục “Trang web ưu tiên” của SKILL.md). Chỉ tin đăng sau lần chạy trước (đã có trong `TOM-TAT.md` thì bỏ). Tối đa: chế độ B 6 tin, A-cập nhật 8 tin, A-đầy đủ 12 tin. Thứ tự ưu tiên: (a) tin của chính doanh nghiệp; (b) tin của hệ sinh thái có kênh ảnh hưởng rõ tới mã; (c) phần ngành riêng của mã. Mỗi tin: ngày · tin (1 câu) · thuộc nhóm (a/b/c) · kênh ảnh hưởng (với b, c) · nhãn · nguồn 1 · nguồn 2.
 
 **3. Sự kiện quá khứ (chỉ A-đầy đủ):** theo "Tìm rộng sự kiện quá khứ" của `thu-thap.md`, chỉ cho mã của mình. VND `get_company_events` là nguồn chính cho cổ tức, GDKHQ, niêm yết bổ sung; cafef để đối chiếu.
 

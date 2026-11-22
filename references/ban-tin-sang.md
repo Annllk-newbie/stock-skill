@@ -12,7 +12,7 @@ Mục tiêu: đọc xong trong **3 phút trên điện thoại** (thân bản ti
 
 0. Hôm nay là thứ 2 hoặc không phải ngày sau một phiên giao dịch (nghỉ lễ) thì dừng, trả lời một dòng. Bản tin gộp mọi phiên kể từ bản tin hoặc báo cáo sâu trước (thứ 3 gộp phiên thứ 2; thứ 5 gộp thứ 3 và thứ 4).
 1. `C bat-dau --ma <DANH_SÁCH_MÃ> --bieu-do MBB TCB` (ngay sau khi clone code).
-2. **Song song:** gọi **agent T** (Haiku, effort low) với đúng lời giao việc ở mục "Agent T" dưới đây (không tự gọi `project_read`); trong lúc đó phiên chính gọi VND theo mục 1.5 của SKILL.md và ghi `<W>/gia/vnd.json`.
+2. **Song song:** gọi **agent T** (Haiku, effort low) với đúng lời giao việc ở mục "Agent T" dưới đây (không tự gọi `project_read`); trong lúc đó phiên chính gọi VND theo mục “Nguồn VND (MCP)” của SKILL.md và ghi `<W>/gia/vnd.json`.
 3. Agent T xong: `C gia --phien <phiên gần nhất đã đóng cửa> --cong-cu "<tên các công cụ mcp__VND__ đã nạp>"` (thay cho lệnh `gia_vnd.py` ở mục "Giá" của SKILL.md; lệnh này chạy cả `gia_vnd.py` và `kiem_tra_du_lieu.py`). Mã thoát 2 → DỪNG theo PHẦN 3 của `thu-thap.md`.
 4. Đọc từ đĩa: `<W>/du-an/data/TOM-TAT.md` và `<W>/du-an/data/MOC-THEO-DOI.md`. Không đọc các CSV: xử lý bằng Python, chỉ in vài dòng.
 5. Gọi song song **B1, B2** và bốn **agent theo mã M-MBB, M-TCB, M-CTG, M-HPG** (Haiku, effort medium). Lời giao việc ngắn: B1, B2 theo đầu file `thu-thap.md`, agent theo mã theo đầu file `agent-ma.md` (chế độ B). File kết quả bắt buộc đúng tên: `<W>/ket_qua_B1.md`, `<W>/ket_qua_B2.md`, `<W>/tham_chieu_B2.csv`, `<W>/ma/<MÃ>.md` (lệnh `ghep` tìm đúng các tên này). Tin "T1" của bản tin lấy từ mục "Tin doanh nghiệp", "Sự kiện công bố", "Hệ sinh thái" của `<W>/ma/<MÃ>.md`.
@@ -42,11 +42,12 @@ Bạn là agent TẢI DỮ LIỆU. Không phân tích, không tóm tắt, không
    claude/chung-khoan/data/VNINDEX.csv
    claude/chung-khoan/data/VN30.csv
    claude/chung-khoan/data/vnd-cong-cu.txt
+   claude/chung-khoan/data/ban-chay-tot.txt
    claude/chung-khoan/luu-tru/kiem-chung.csv
    claude/chung-khoan/luu-tru/su-kien-nen-tang.csv
    claude/chung-khoan/luu-tru/tham-chieu.csv
    claude/chung-khoan/luu-tru/von-ngoai.csv
-   (4 file luu-tru có thể chưa có trong dự án: lỗi "không tìm thấy" thì bỏ qua, không thử lại)
+   (4 file luu-tru và ban-chay-tot.txt có thể chưa có trong dự án: lỗi "không tìm thấy" thì bỏ qua, không thử lại)
 2. Chạy: python <S>/scripts/du_an.py luu --out <W>/du-an
 3. Trả lời đúng dòng JSON mà lệnh đó in ra, không thêm gì khác.
 ```

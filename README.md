@@ -37,7 +37,7 @@ Các bước còn lại (VND MCP, agent, viết lời văn, `project_write`, g�
 
 ### Chuẩn bị (cả B và A)
 - **01 Tải code GitHub** – lệnh `git clone` ở mục 0 của SKILL.md. Ghi `<S>`. Lỗi → DỪNG (chưa có nhật ký, thông báo kèm nguyên văn lỗi).
-- **02 VND health và công cụ** – MCP `mcp__VND__health`, nạp công cụ bằng ToolSearch `mcp__VND__`. Hướng dẫn: SKILL.md mục 1.5. Lỗi sau một lần thử lại → DỪNG.
+- **02 VND health và công cụ** – MCP `mcp__VND__health`, nạp công cụ bằng ToolSearch `mcp__VND__`. Hướng dẫn: SKILL.md mục “Nguồn VND (MCP)”. Lỗi sau một lần thử lại → DỪNG.
 - **03 VND lịch, giá, chỉ số, khối ngoại sàn** – MCP `get_trading_calendar`, `get_stock_price_by_date`, `get_vnmarket_prices` (mỗi chỉ số một lần), `get_foreign_trading` (VNINDEX), `get_change_prices` (Brent, vàng). Ghi `<W>/gia/vnd.json`.
 - **04 gia_vnd.py** – đọc `<W>/gia/vnd.json`, `<W>/du-an/data/<MÃ>.csv`, `VNINDEX.csv`, `VN30.csv`, `vnd-cong-cu.txt`. Ghi `<W>/gia/gia_<MÃ>_ctck.csv`, `gia_VNINDEX_ctck.csv`, `gia_VN30_ctck.csv`, `<W>/gia/ket-qua.json`. Mã thoát 2 → DỪNG (PHẦN 3 `thu-thap.md`). Cần bước 06 xong trước (lịch sử giá).
 - **05 kiem_tra_du_lieu.py** – đọc các file `gia_*_ctck.csv`. Có `loi` thì phiên đó không dùng cho dự báo.
@@ -80,5 +80,22 @@ Hướng dẫn: PHẦN 2 `thu-thap.md` (agent theo mã: `agent-ma.md`). Mỗi ag
 - **Dự án (Project):** trạng thái giữa các lần chạy: lịch sử giá `data/<MÃ>.csv`, các nhật ký CSV, `TOM-TAT.md`, `MOC-THEO-DOI.md`, lịch sử dự báo, ghi chú Obsidian 14 ngày gần nhất.
 - **Vault Obsidian trên máy tính** (`Documents\Data\Stock data`): kho lưu trữ lâu dài, đồng bộ bằng skill `dong-bo-obsidian`.
 - **`<W>` trong phiên chạy:** tạm thời, mất khi phiên kết thúc; cái gì cần giữ phải qua bước 30.
+
+## Bản ổn định (tag `on-dinh`)
+
+- Tag `on-dinh` trỏ vào bản code đã chạy được; mỗi lần nâng thì thêm một tag có ngày (`on-dinh-yyyy-mm-dd`) để quay lại được bản cũ hơn nữa.
+- **Tự quay về:** lần chạy gặp lỗi code (nhật ký ghi "LỖI CODE của skill" – lỗi cú pháp, sai tham số, thiếu hàm…) thì làm theo mục "Khi code mới lỗi" của SKILL.md: chép nhật ký sang `research/nhat-ky-ban-moi.txt`, chuyển bản clone sang tag `on-dinh`, làm lại lần chạy theo hướng dẫn của bản đó, báo rõ đã dùng bản ổn định. Lỗi dữ liệu hay VND không phải lỗi code: không quay về.
+  ```bash
+  git -C research/skill fetch -q --depth 1 origin tag on-dinh && git -C research/skill checkout -q on-dinh
+  ```
+- **Tự ghi bản chạy tốt:** `chay.py … luu` thấy nhật ký không có dòng LỖI/DỪNG nào thì thêm commit đang chạy vào `data/ban-chay-tot.txt` trong dự án.
+- **Nâng tag (Claude làm mỗi khi sửa kho, trước commit đầu tiên):** đọc dòng cuối của `claude/chung-khoan/data/ban-chay-tot.txt`; commit đó mới hơn `on-dinh` thì
+  ```bash
+  git tag -f on-dinh <commit> && git tag on-dinh-<ngày> <commit> && git push -f origin on-dinh on-dinh-<ngày>
+  ```
+  Không bao giờ gắn `on-dinh` vào commit chưa có trong `ban-chay-tot.txt`, trừ lần gắn đầu tiên (ghi rõ ở danh sách dưới).
+
+Lịch sử tag:
+- `on-dinh-2026-11-22` → `dc9be80` – gắn TẠM: bản VND-only cuối cùng trước khi thêm nhật ký và chay.py. Chưa có lần chạy thật trọn vẹn trên bản này (bản chạy thật gần nhất, 3ef948d, còn lấy giá KBS/Vietcap nên không dùng làm bản ổn định được). Sẽ được thay bằng commit đầu tiên ghi trong `ban-chay-tot.txt`.
 
 Mỗi thay đổi là một commit có ghi lý do. Muốn quay lại bản trước: `git revert`. Đổi bước, thêm script hay đổi file đầu vào/đầu ra thì sửa luôn sơ đồ này và danh sách tên bước trong PHẦN 1 của `thu-thap.md`.
