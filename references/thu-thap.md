@@ -1,6 +1,6 @@
 # Thu thập và kiểm chứng
 
-File này có ba phần. **Phiên chính chỉ đọc PHẦN 1** (dừng ở dòng `## PHẦN 2`; dùng Read với `limit`). **Agent thu thập đọc PHẦN 1 và PHẦN 2.** PHẦN 3 chỉ đọc khi `lay_gia_cty_ck.py` báo lỗi.
+File này có ba phần. **Phiên chính chỉ đọc PHẦN 1** (dừng ở dòng `## PHẦN 2`; dùng Read với `limit`). **Agent thu thập đọc PHẦN 1 và PHẦN 2.** PHẦN 3 chỉ đọc khi VND MCP hoặc `gia_vnd.py` báo lỗi.
 
 Phiên chính KHÔNG chép nội dung file này vào lời giao việc. Lời giao việc cho agent thu thập chỉ gồm: tên agent (B1, A3…), câu "Đọc `<SKILL_DIR>/references/thu-thap.md` PHẦN 1 và PHẦN 2, làm đúng phần việc của agent đó", và các tham số ở mục "Tham số phiên chính phải đưa".
 
@@ -27,7 +27,7 @@ Thân bản tin và phần kết luận của báo cáo chỉ dùng số ✔; s�
 - **Số Việt Nam khớp tuyệt đối mới là ✔:** giá cổ phiếu khớp đúng bước giá; VN-Index và VN30 lệch không quá 0,01 điểm; khối ngoại và thanh khoản lệch không quá 1 tỷ đồng hoặc 1%, lấy mức lớn hơn; tỷ giá khớp đúng số. Lệch hơn là ✖.
 - **Số quốc tế (V2, F1):** khớp (✔) khi hai nguồn cùng chiều và % thay đổi lệch không quá 0,1 điểm phần trăm; lợi suất lệch không quá 2 điểm cơ bản; dầu và DXY lệch không quá 0,5%. Mức điểm ghi theo nguồn cấp cao hơn. Ngược chiều hoặc lệch hơn là ✖. Hai bài cùng chép một hãng tin chỉ là một nguồn.
 - **Khác định nghĩa KHÔNG phải mâu thuẫn:** trước khi gắn ✖, kiểm tra hai số có cùng định nghĩa không; khác thì ghi thành hai dòng riêng, mỗi dòng mang nhãn của chính nó. Các cặp hay nhầm:
-  - Thanh khoản: *tổng giá trị giao dịch HOSE gồm thỏa thuận* (chỉ tiêu mặc định, cùng định nghĩa với `chi_so` của Vietcap) khác *giá trị khớp lệnh*; HOSE khác *ba sàn*.
+  - Thanh khoản: *tổng giá trị giao dịch HOSE gồm thỏa thuận* (chỉ tiêu mặc định, cùng định nghĩa với `accumulatedVal` của VND trong `chi_so`) khác *giá trị khớp lệnh*; HOSE khác *ba sàn*.
   - Khối ngoại và tự doanh: *ròng trên HOSE* (mặc định, ghi vào `von-ngoai.csv`) khác *ròng ba sàn/toàn thị trường*; bài không nêu phạm vi thì ghi "phạm vi không nêu" và chỉ dùng để xác nhận khi khớp một số đã rõ phạm vi.
   - Số trong phiên khác số cuối ngày (giá USD ngân hàng, tỷ giá tự do, chỉ số giữa phiên): ghi giờ của số, dùng số muộn nhất trong ngày.
 - **Kiểm tra nội tại:** thấp ≤ mở, đóng ≤ cao; đóng cửa trong biên độ ±7% so với tham chiếu; điểm thay đổi của VN-Index bằng điểm hôm nay trừ điểm phiên trước, và khớp % thay đổi. Sai là ✖ dù hai nguồn khớp nhau.
@@ -69,8 +69,8 @@ Có `loi`: không dùng phiên đó cho dự báo, ghi ở mục "Dữ liệu". 
 
 | # | Mục | Nguồn chính → nguồn kiểm tra |
 |---|-----|------------------------------|
-| G1 | Giá phiên mới (mở, cao, thấp, đóng, khối lượng) | đã có từ `lay_gia_cty_ck.py`; chỉ lấy cho mã chưa ✔: cophieu68.vn → Vietstock |
-| G2 | VN-Index, VN30: điểm, % thay đổi; thanh khoản HOSE = TỔNG giá trị giao dịch gồm thỏa thuận (khớp lệnh ghi riêng nếu có) | số `chi_so` phiên chính đưa → MỘT bài Vietstock / CafeF / Tin nhanh chứng khoán ghi cùng điểm đóng cửa |
+| G1 | Giá phiên mới (mở, cao, thấp, đóng, khối lượng) | đã có từ VND qua `gia_vnd.py`; chỉ lấy trên web khi VND lỗi hoặc mã ✖/⊘: cophieu68.vn → Vietstock |
+| G2 | VN-Index, VN30: điểm, % thay đổi; thanh khoản HOSE = TỔNG giá trị giao dịch gồm thỏa thuận (khớp lệnh ghi riêng nếu có) | số `chi_so` (VND) phiên chính đưa; chỉ tìm bài báo khi VND lỗi hoặc chỉ số ✖ |
 | G3 | Khối ngoại và tự doanh ròng trên HOSE (khớp lệnh + thỏa thuận), mỗi số kèm PHẠM VI bài nêu (HOSE / ba sàn / không nêu); ghi riêng giao dịch thỏa thuận lớn đơn lẻ | CafeF / Vietstock / Tin nhanh chứng khoán |
 | T1 | Tin doanh nghiệp từng mã (KQKD, cổ tức, ĐHCĐ, phát hành, giao dịch cổ đông lớn/nội bộ) | trang ưu tiên → hsx.vn, vsd.vn |
 | T2 | Ngành: ngân hàng (lãi suất, tín dụng, NHNN), thép (giá thép, quặng sắt, Trung Quốc), chứng khoán (thanh khoản, margin, ETF) | trang ưu tiên |
@@ -119,10 +119,12 @@ T2, F3–F7, phần chính sách của F2 và phần xác suất/lịch của F1
 
 **Tìm rộng sự kiện quá khứ (chỉ phân tích sâu, A2 và A3):** để giải thích từng đỉnh/đáy phải tìm rộng, không chỉ tin mới. Trang ưu tiên (mục 1.2 của SKILL.md) trước; rồi WebSearch theo từng nhóm ở Phần A của `ky-thuat.md` (lịch chia cổ tức, đáo hạn phái sinh, cơ cấu ETF, sự kiện doanh nghiệp, dòng tiền, ngành và hàng hóa, vĩ mô, tin đồn), cả quá khứ trong toàn khoảng dữ liệu giá lẫn lịch sắp tới. Chu kỳ ~1 tháng thì ưu tiên sự kiện hằng tháng; ~1 quý thì BCTC, cơ cấu ETF; ~1 năm thì mùa vụ, ĐHCĐ, cổ tức. Ghi cả sự kiện KHÔNG kèm biến động giá (cần cho kiểm định). Sự kiện có lịch cố định (đáo hạn phái sinh thứ 5 tuần thứ ba, kỳ xem xét ETF/chỉ số) thì sinh đủ ngày cho cả khoảng dữ liệu.
 
-## PHẦN 3 – Khi `lay_gia_cty_ck.py` báo lỗi
+## PHẦN 3 – Khi VND MCP lỗi hoặc `gia_vnd.py` báo lỗi
 
-Thử lần lượt, dừng ở cách đầu tiên được:
-1. Trình duyệt trên máy tính của người dùng (chỉ khi phiên có công cụ đó; đọc skill của trình duyệt trước): mở `https://kbbuddywts.kbsec.com.vn/iis-server/investment/stocks/MBB/data_day?sdate=<dd-mm-yyyy>&edate=<dd-mm-yyyy>` rồi `fetch` cùng đường dẫn cho từng mã; mở `https://trading.vietcap.com.vn/api/chart/OHLCChart/gap-chart` (trang 404 là bình thường) rồi `fetch` POST, mỗi lần một mã, thân `{"timeFrame":"ONE_DAY","symbols":["<MÃ>"],"to":<unix giây>,"countBack":25}`. Ghi nguyên văn kết quả ra file, tải `claude/chung-khoan/data/<MÃ>.csv` (bản dự phòng) rồi chạy script với `--tu-file kbs=… vci=… --doi-chieu MBB=MBB.csv …` và nối dòng phiên mới vào file giá.
-2. Tải bản dự phòng `claude/chung-khoan/data/<MÃ>.csv`, giao B1 (bản tin sáng) hoặc A3 (phân tích sâu) lấy giá phiên mới từ web theo G1 (hai nguồn), đối chiếu với file. Ghi lỗi vào mục "Dữ liệu". Không thử vòng qua bằng cách khác.
+Từ 22/11/2026 giá và chỉ số chỉ lấy từ VND MCP (người dùng bỏ KBS và Vietcap). Trước khi kết luận VND lỗi: nạp công cụ bằng ToolSearch với từ khóa `mcp__VND__` (không dùng từ khóa khác), gọi `mcp__VND__health`, rồi gọi lại đúng lệnh bị lỗi MỘT lần (gặp "throttled" thì chờ 20 giây). Chỉ ghi "VND MCP lỗi" khi vẫn lỗi, kèm nguyên văn thông báo lỗi; không bao giờ ghi "không phản hồi" khi chưa gọi (báo cáo 22/11/2026 đã ghi sai như vậy).
 
-Hai API này không được công bố chính thức nên cấu trúc có thể đổi; script báo lỗi cấu trúc thay vì đoán, khi đó ghi ⊘ và báo người dùng. Không dùng: API VNDirect, API cũ của TCBS (đã ngừng), bảng giá iBoard của SSI (có lớp chống bot, không vượt).
+Vẫn lỗi thì:
+1. Lịch sử giữ nguyên từ bản lưu `claude/chung-khoan/data/<MÃ>.csv`, `data/VNINDEX.csv`, `data/VN30.csv` (agent T đã tải).
+2. Giao B1 (bản tin sáng) hoặc A3 (phân tích sâu) lấy giá phiên mới từ web theo G1 (hai nguồn độc lập, ghi rõ giá đóng cửa và ngày của phiên), ghi thành file JSON cùng khuôn `--vnd` của `gia_vnd.py` (thêm trường `"nguon"`), rồi chạy `gia_vnd.py` như thường. Nhãn theo quy tắc hai nguồn ở PHẦN 1. Ghi lỗi vào mục "Dữ liệu". Không thử vòng qua bằng cách khác.
+
+`gia_vnd.py` báo `⊘ chưa có phiên` thì kiểm lịch VND (`get_trading_calendar`) xem còn thiếu phiên nào giữa phiên cuối của bản lưu và phiên cần lấy, gọi `get_stock_price_by_date` cho từng phiên thiếu (nhiều mã một lần), thêm vào file `--vnd`, chạy lại. Báo `dieu_chinh` (giá tham chiếu khác đóng cửa trước) thì đối chiếu `get_company_events` của mã để xác nhận sự kiện quyền và ghi ở mục "Dữ liệu". Không dùng: API VNDirect gọi trực tiếp, API cũ của TCBS, bảng giá iBoard của SSI, API KBS và Vietcap (đã bỏ).

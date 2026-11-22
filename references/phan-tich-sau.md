@@ -48,10 +48,10 @@ Sau khi agent O xong, phiên chính nối toàn văn báo cáo vào cuối ghi c
 ### Lưu (mọi file ghi bằng `project_write` với `local_path`)
 Chỉ ghi thêm: báo cáo và bản tin đã lưu không bao giờ bị sửa; nhật ký dự báo và lịch sử dự báo chỉ thêm dòng ở cuối; số sai trong báo cáo cũ thì đính chính trong báo cáo MỚI.
 
-Trước khi lưu: chép `gia_<MÃ>_ctck.csv` thành `<W>/du-an/data/<MÃ>.csv`, chạy `python scripts/nen_du_lieu.py --thu-muc <W>/du-an --ngay <hôm nay>`. Ghi vào dự án, dưới `claude/chung-khoan/`:
+Trước khi lưu: chép `gia_<MÃ>_ctck.csv` thành `<W>/du-an/data/<MÃ>.csv` và `gia_VNINDEX_ctck.csv`, `gia_VN30_ctck.csv` thành `<W>/du-an/data/VNINDEX.csv`, `VN30.csv`, chạy `python scripts/nen_du_lieu.py --thu-muc <W>/du-an --ngay <hôm nay>`. Ghi vào dự án, dưới `claude/chung-khoan/`:
 1. `obsidian/Báo cáo sâu/<yyyy-mm-dd> Phân tích sâu.md` (tóm tắt + toàn văn báo cáo; **file mới duy nhất của lần chạy**). Không tạo `<ngày>-sau.md` hay file theo ngày nào khác; không tạo `obsidian/Dữ liệu/Tóm tắt dữ liệu.md` và `obsidian/Nhật ký đồng bộ.md` (skill `dong-bo-obsidian` lấy thẳng từ `data/TOM-TAT.md` và `obsidian/da-dong-bo.md`).
 2. **`data/MOC-THEO-DOI.md`** (ghi đè; bản tin sáng đọc file này): lấy `<W>/moc_nhap.md` (phần số đã điền sẵn từ script), điền các chỗ "(điền …)" từ báo cáo đã kiểm tra: ngày phân tích, mức giá làm kịch bản chính không còn đúng của từng mã, số dự báo độc lập, điểm áp lực khối ngoại, dòng "Chuỗi truyền dẫn" (1–2 câu: cú sốc đang theo dõi, chỗ đứt kèm lý do có nguồn, điều làm cách đọc này sai), lịch sự kiện 10 ngày tới; dòng đầu ghi "Nguồn đầy đủ: ghi chú Báo cáo sâu/<yyyy-mm-dd> Phân tích sâu". Không sửa các con số script đã điền. Tối đa khoảng 40 dòng, không bảng.
-3. Trạng thái đã đổi: các CSV nhật ký, `<MÃ>/su-kien.csv` (không bị cắt; không ghi ngày đáo hạn VN30F vào đây, `chay_sau.py` tự sinh), `<MÃ>/nhat-ky-du-bao.md`, hai file dự báo, `data/TOM-TAT.md`, file `luu-tru/<tên>.csv` trong `can_ghi_lai_vao_du_an`, và bản dự phòng giá `data/<MÃ>.csv` của mã có giá ✔.
+3. Trạng thái đã đổi: các CSV nhật ký, `<MÃ>/su-kien.csv` (không bị cắt; không ghi ngày đáo hạn VN30F vào đây, `chay_sau.py` tự sinh), `<MÃ>/nhat-ky-du-bao.md`, hai file dự báo, `data/TOM-TAT.md`, file `luu-tru/<tên>.csv` trong `can_ghi_lai_vao_du_an`, lịch sử giá `data/<MÃ>.csv`, `data/VNINDEX.csv`, `data/VN30.csv` (bắt buộc mỗi lần chạy: đây là lịch sử giá duy nhất) và `data/vnd-cong-cu.txt`.
 4. Các ghi chú Obsidian sống đã sửa và `NHAC-DONG-BO.md` (mục trên). Không tạo file nào khác: mỗi lần chạy chỉ thêm đúng một file mới vào dự án. Ghi chú báo cáo và bản tin cũ hơn 14 ngày do skill `dong-bo-obsidian` xóa khỏi dự án sau khi đã có trong vault.
 
 ### Câu trả lời cuối (3–5 phút đọc)
@@ -83,7 +83,7 @@ Bạn là agent TỔNG HỢP VÀ PHÂN TÍCH. Dữ liệu đã được thu th�
 
 
 ### Bước 2: Dữ liệu giá và chu kỳ đo được
-Cần chuỗi giá ngày dạng CSV với cột `date,open,high,low,close,volume`. Với các mã theo dõi, đó là `research/gia/gia_<MÃ>_ctck.csv` do `lay_gia_cty_ck.py --lich-su 1500` tạo (chỉ số chung: `gia_VNINDEX_ctck.csv`). Với mã khác hoặc khi API lỗi, nguồn theo thứ tự: file người dùng gửi → file giá trong dự án → bảng giá lịch sử trên trang ưu tiên → trang dữ liệu công khai khác. Ưu tiên giá **đã điều chỉnh** cổ tức/chia tách. Lấy luôn dữ liệu chỉ số chung (VN-Index hoặc chỉ số tương ứng) cùng khoảng thời gian, để biết cổ phiếu có đang chỉ đi theo cả thị trường hay không.
+Cần chuỗi giá ngày dạng CSV với cột `date,open,high,low,close,volume`. Với các mã theo dõi, đó là `research/gia/gia_<MÃ>_ctck.csv` do `gia_vnd.py` tạo (lịch sử trong dự án + phiên mới từ VND) (chỉ số chung: `gia_VNINDEX_ctck.csv`). Với mã khác hoặc khi VND lỗi, nguồn theo thứ tự: file người dùng gửi → file giá trong dự án → bảng giá lịch sử trên trang ưu tiên → trang dữ liệu công khai khác. Ưu tiên giá **đã điều chỉnh** cổ tức/chia tách. Lấy luôn dữ liệu chỉ số chung (VN-Index hoặc chỉ số tương ứng) cùng khoảng thời gian, để biết cổ phiếu có đang chỉ đi theo cả thị trường hay không.
 
 **Lấy bao nhiêu năm:** mặc định **5 năm** nếu có. Quy tắc là phải có ít nhất 5–6 chu kỳ hoàn chỉnh, và đủ nhiều năm để so sánh các năm với nhau:
 
