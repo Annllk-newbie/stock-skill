@@ -14,6 +14,7 @@ Toàn thị trường: <out>/ap_luc_von_ngoai.json, ap_luc.txt, chuoi_truyen_dan
 In ra bản tóm tắt ngắn (cũng ghi <out>/tom_tat_script.md) và ghi <out>/moc_nhap.md: phần SỐ của data/MOC-THEO-DOI.md
 đã điền sẵn từ kết quả script; phiên chính chỉ thêm mốc "không còn đúng" và lịch sự kiện lấy từ báo cáo.
 Script lỗi ở bước nào thì ghi "LỖI" kèm thông báo ở bước đó và chạy tiếp các bước còn lại.
+--nhat-ky <file>: ghi thêm mỗi script con một dòng (OK/LỖI kèm gợi ý sửa) vào nhật ký chạy (xem nhat_ky.py).
 """
 import argparse
 import csv
@@ -24,6 +25,10 @@ import subprocess
 import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, HERE)
+from nhat_ky import ghi_dong, goi_y  # noqa: E402
+
+NK = None  # đường dẫn nhật ký chạy (--nhat-ky); None thì không ghi
 COT_SK = ["date", "event", "group", "source_url", "reliability", "note"]
 
 
@@ -74,11 +79,17 @@ def su_kien_day_du(du_an, ma, gia, out):
     return p, len(rows)
 
 
-def chay(args, out_json=None, out_txt=None):
+def chay(args, out_json=None, out_txt=None, ten=None):
     """Chạy một script. Đầu ra dạng '<chữ>...{json}' được tách: chữ -> out_txt, JSON -> out_json. Trả về (dict|None, lỗi|None)."""
+    ten = ten or os.path.basename(args[0])
     p = subprocess.run([sys.executable] + args, capture_output=True, text=True)
     if p.returncode != 0:
-        return None, (p.stderr.strip().splitlines() or ["lỗi không rõ"])[-1][:300]
+        e = (p.stderr.strip().splitlines() or ["lỗi không rõ"])[-1][:300]
+        if NK:
+            ghi_dong(NK, f"chay_sau · {ten}", "loi", f"mã thoát {p.returncode}: {e}", goi_y(p.stderr))
+        return None, e
+    if NK:
+        ghi_dong(NK, f"chay_sau · {ten}", "ok")
     s = p.stdout
     lines = s.split("\n")
     i = next((k for k, l in enumerate(lines) if l.startswith("{") or l.startswith("[")), None)
@@ -118,7 +129,10 @@ def main():
     ap.add_argument("--nghi", nargs="*", default=[])
     ap.add_argument("--kich-ban", nargs="*", default=[], help="MÃ=đúng:sai (số lần kịch bản chính đã chấm)")
     ap.add_argument("--nhe", action="store_true", help="giữa tuần: không chạy lại kiểm định chu kỳ và sự kiện")
+    ap.add_argument("--nhat-ky", default=None, help="file nhật ký chạy để ghi từng script con")
     a = ap.parse_args()
+    global NK
+    NK = a.nhat_ky
     kb = dict(x.split("=", 1) for x in a.kich_ban)
     V = os.path.join(a.gia_dir, "gia_VNINDEX_ctck.csv")
     S = lambda n: os.path.join(HERE, n)
@@ -131,11 +145,13 @@ def main():
         o = lambda n: os.path.join(W, n)
         if not os.path.isfile(G):
             L.append(f"## {ma}\n- LỖI: không có file giá {G}")
+            if NK:
+                ghi_dong(NK, f"chay_sau · {ma} file giá", "loi", f"không có file giá {G}")
             continue
         loi = []
 
         def buoc(ten, args, js=None, txt=None):
-            d, e = chay(args, js, txt)
+            d, e = chay(args, js, txt, ten=f"{ma} {ten}")
             if e:
                 loi.append(f"{ten}: {e}")
             return d
@@ -217,13 +233,13 @@ def main():
 
     vn = os.path.join(a.du_an, "data", "von-ngoai.csv")
     if os.path.isfile(vn):
-        d1, e1 = chay([S("ap_luc_von_ngoai.py"), vn], os.path.join(a.out, "ap_luc_von_ngoai.json"))
-        _, e2 = chay([S("ap_luc_von_ngoai.py"), vn, "--chu"], None, os.path.join(a.out, "ap_luc.txt"))
+        d1, e1 = chay([S("ap_luc_von_ngoai.py"), vn], os.path.join(a.out, "ap_luc_von_ngoai.json"), ten="áp lực khối ngoại")
+        _, e2 = chay([S("ap_luc_von_ngoai.py"), vn, "--chu"], None, os.path.join(a.out, "ap_luc.txt"), ten="áp lực khối ngoại (chữ)")
         L.append("## Dòng vốn ngoại\n- " + (f"LỖI {e1 or e2}" if (e1 or e2) else "xem ap_luc.txt và ap_luc_von_ngoai.json"))
         vni = os.path.join(a.gia_dir, "gia_VNINDEX_ctck.csv")
         cmd = [S("chuoi_truyen_dan.py"), vn] + (["--vnindex", vni] if os.path.isfile(vni) else [])
-        _, e3 = chay(cmd, os.path.join(a.out, "chuoi_truyen_dan.json"))
-        _, e4 = chay(cmd + ["--chu"], None, os.path.join(a.out, "chuoi.txt"))
+        _, e3 = chay(cmd, os.path.join(a.out, "chuoi_truyen_dan.json"), ten="chuỗi truyền dẫn")
+        _, e4 = chay(cmd + ["--chu"], None, os.path.join(a.out, "chuoi.txt"), ten="chuỗi truyền dẫn (chữ)")
         L.append("## Chuỗi truyền dẫn\n- " + (f"LỖI {e3 or e4}" if (e3 or e4) else "xem chuoi.txt và chuoi_truyen_dan.json"))
 
     tt = "# Tóm tắt kết quả script\n\n" + "\n\n".join(L) + "\n"

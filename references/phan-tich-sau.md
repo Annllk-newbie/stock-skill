@@ -18,15 +18,16 @@ Vault: `<VAULT>` (đường dẫn ghi trong SKILL.md). Bản trong dự án: `cl
 - Không có công cụ máy tính hoặc máy không phản hồi: chạy bằng dữ liệu trong dự án và ghi "Không đọc được vault trên máy tính lần này" ở đầu báo cáo.
 
 ### Các bước của phiên chính
+**Mọi bước đều ghi nhật ký chạy** theo mục "Nhật ký chạy" ở PHẦN 1 của `thu-thap.md` (đúng tên bước cố định; bước 4 thêm `--nhat-ky research/nhat-ky-chay.txt`). Báo cáo có mục `## Nhật ký chạy` ở cuối (nguyên văn file, ghép bằng `cat` vào `<W>/bao_cao.md` sau kiểm tra chéo, trước agent O).
 1. **Song song:** (a) lệnh lấy giá ở mục "Giá" của SKILL.md rồi `kiem_tra_du_lieu.py`; (b) **agent T** (Haiku, effort low) tải trạng thái: dùng lời giao việc "Agent T" trong `ban-tin-sang.md`, thêm vào danh sách đường dẫn (đều dưới `claude/chung-khoan/`): `<MÃ>/su-kien.csv` và `<MÃ>/nhat-ky-du-bao.md` của từng mã theo dõi, `luu-tru/su-kien-ma.csv` (sự kiện cũ của các mã, `chay_sau.py` tự ghép), `obsidian/da-dong-bo.md`, `obsidian/00 Tổng quan.md`, `obsidian/Mã/<MÃ>.md` của từng mã, và 8 ghi chú `obsidian/Vĩ mô & dòng vốn/`: `Dòng vốn ngoại.md`, `Fed & Mỹ.md`, `NHNN & lãi suất.md`, `Tỷ giá.md`, `Trái phiếu.md`, `ETF & khu vực.md`, `Đầu tư công & FDI.md`, `Doanh nghiệp tham chiếu.md`; (c) đồng bộ và liệt kê vault (mục trên).
 2. Đọc từ đĩa `TOM-TAT.md`, `MOC-THEO-DOI.md` và 20 dòng cuối của mỗi `nhat-ky-du-bao.md` (bằng lệnh). **Chấm dự báo kỳ trước** so với giá mới: mỗi dòng Đúng / Sai / Chưa rõ kèm giá thực, ghi thêm vào cuối nhật ký.
 3. **Thu thập** theo mức chạy (Haiku, effort medium, lời giao việc ngắn theo đầu file `thu-thap.md`; bốn agent theo mã M-MBB, M-TCB, M-CTG, M-HPG theo đầu file `agent-ma.md`). `<W>/ma/su_kien_<MÃ>.csv` ghép vào `<W>/du-an/<MÃ>/su-kien.csv` (bỏ dòng trùng ngày và nội dung). Sau đó gom mọi số ◐/✖ (kể cả dòng ◐/✖ của 7 ngày gần nhất trong `kiem-chung.csv`) vào `can_kiem_chung.md` và gọi **A5**. Gắn nhãn, ghi thêm dòng vào các CSV nhật ký và `<W>/du-an/<MÃ>/su-kien.csv` bằng Python.
 4. **Một lệnh cho mọi script:**
    ```bash
-   python scripts/chay_sau.py <DANH_SÁCH_MÃ> --gia-dir <W>/gia --du-an <W>/du-an --out <W> --bieu-do MBB TCB \
+   python scripts/chay_sau.py <DANH_SÁCH_MÃ> --gia-dir <W>/gia --du-an <W>/du-an --out <W> --bieu-do MBB TCB --nhat-ky <W>/nhat-ky-chay.txt \
        [--nghi yyyy-mm-dd …] [--kich-ban MBB=<đúng>:<sai> TCB=<đúng>:<sai>]
    ```
-   Lệnh này chạy chu kỳ, kiểm định chu kỳ / sự kiện / dự báo, rủi ro, chỉ báo, vùng giá 6 phiên, biểu đồ, điểm áp lực khối ngoại và chuỗi truyền dẫn (`chuoi.txt`) cho mọi mã; ghi kết quả vào `<W>/<MÃ>/`, in `tom_tat_script.md` và tạo `moc_nhap.md`. Chỉ đọc bản tóm tắt nó in ra. `--kich-ban` lấy số Đúng/Sai tích lũy từ nhật ký dự báo; `--nghi` khi 6 phiên tới có ngày nghỉ lễ. Bước nào ghi "LỖI" thì chạy riêng script đó để xem lỗi. Khi `ap_luc_von_ngoai.py` đã tự kiểm chứng (≥ 40 phiên) thì chạy thêm `kiem_dinh.py fdr`. `event_study.py` chỉ chạy khi agent tổng hợp yêu cầu.
+   Lệnh này chạy chu kỳ, kiểm định chu kỳ / sự kiện / dự báo, rủi ro, chỉ báo, vùng giá 6 phiên, biểu đồ, điểm áp lực khối ngoại và chuỗi truyền dẫn (`chuoi.txt`) cho mọi mã; ghi kết quả vào `<W>/<MÃ>/`, in `tom_tat_script.md` và tạo `moc_nhap.md`. Chỉ đọc bản tóm tắt nó in ra. `--kich-ban` lấy số Đúng/Sai tích lũy từ nhật ký dự báo; `--nghi` khi 6 phiên tới có ngày nghỉ lễ. Bước nào ghi "LỖI" (cũng có trong nhật ký chạy, kèm gợi ý sửa) thì chạy riêng script đó để xem lỗi. Khi `ap_luc_von_ngoai.py` đã tự kiểm chứng (≥ 40 phiên) thì chạy thêm `kiem_dinh.py fdr`. `event_study.py` chỉ chạy khi agent tổng hợp yêu cầu.
 5. **Tổng hợp (agent Sonnet, effort high):** lời giao việc chỉ gồm: "Đọc `<S>/SKILL.md` mục 'Nguyên tắc luôn áp dụng' và `<S>/references/phan-tich-sau.md` từ dòng '## PHẦN 2' đến hết, rồi làm theo"; mức chạy (đầy đủ / cập nhật) và ngày báo cáo trước; danh sách mã, khung nắm giữ và chu kỳ người dùng quan sát (mục 1.1 của SKILL.md); đường dẫn `<W>`, `<W>/tom_tat_script.md`, `<W>/vault/`; kết quả chấm dự báo kỳ trước. Agent ghi `<W>/bao_cao.md` (một báo cáo chung cho mọi mã). Phiên chính chỉ tự viết khi agent lỗi, và ghi rõ.
 6. **Kiểm tra chéo cuối cùng (agent Opus, effort medium) – BẮT BUỘC:** theo `kiem-tra-cheo.md`. Có lỗi thì gửi danh sách cho agent Sonnet sửa đúng các lỗi đó; ghi mục "Kiểm tra chéo".
 7. **Ghi chú Obsidian (agent O – Sonnet, effort low):** lời giao việc ở mục "Obsidian" dưới đây.
@@ -182,6 +183,7 @@ Dùng cấu trúc cố định để người dùng dễ so sánh giữa các l�
 ## Độ đầy đủ dữ liệu (G1…L1, F1…F7 cho từng mã: có / không có tin mới / không lấy được – lý do)
 ## Nguồn (link, kèm cấp nguồn 1/2/3) và các trang không đọc được
 ## Kiểm tra chéo (Opus: số lỗi tìm thấy, đã sửa, còn mở)
+## Nhật ký chạy (nguyên văn research/nhat-ky-chay.txt)
 ## Lưu ý
 ```
 
