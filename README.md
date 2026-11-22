@@ -26,6 +26,15 @@ Quy ước: `<W>` = `research/` (thư mục làm việc của lần chạy) · `
  Lỗi ở 01–04 (code hoặc giá) = DỪNG cả lần chạy, chỉ gửi thông báo kèm nhật ký.
 ```
 
+### Lệnh điều phối `scripts/chay.py`
+Mọi bước script gom vào 5 lệnh, chạy đúng thứ tự: `python research/skill/scripts/chay.py <ban-tin|sau|sau-nhe> <lệnh>`.
+- `bat-dau --ma …` → bước 01 (tạo nhật ký, in kế hoạch).
+- `gia --phien … --cong-cu …` → bước 04–05 (sau 03 và 06). Mã thoát 2 = DỪNG.
+- `tinh` → B: bước 20–23 + `tb20.txt`; A: bước 24.
+- `ghep` → bước 28 (B: phụ lục + ghi chú bản tin; A: thêm nhật ký vào `bao_cao.md`).
+- `luu` → bước 29 + danh sách file cần `project_write` (`<W>/can-luu.json`), tính bằng so nội dung với lúc agent T vừa tải xong.
+Các bước còn lại (VND MCP, agent, viết lời văn, `project_write`, gửi) là việc của phiên chính. `chay.py <chế độ> ke-hoach` in thứ tự đầy đủ.
+
 ### Chuẩn bị (cả B và A)
 - **01 Tải code GitHub** – lệnh `git clone` ở mục 0 của SKILL.md. Ghi `<S>`. Lỗi → DỪNG (chưa có nhật ký, thông báo kèm nguyên văn lỗi).
 - **02 VND health và công cụ** – MCP `mcp__VND__health`, nạp công cụ bằng ToolSearch `mcp__VND__`. Hướng dẫn: SKILL.md mục 1.5. Lỗi sau một lần thử lại → DỪNG.

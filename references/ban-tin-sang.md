@@ -8,18 +8,18 @@ Mục tiêu: đọc xong trong **3 phút trên điện thoại** (thân bản ti
 
 `<W>` = thư mục làm việc `research/`. `<S>` = thư mục skill.
 
-**Mọi bước dưới đây đều ghi nhật ký chạy** theo mục "Nhật ký chạy" ở PHẦN 1 của `thu-thap.md` (script chạy qua `nhat_ky.py chay`, việc khác ghi bằng `nhat_ky.py ghi`, đúng tên bước cố định).
+**Lệnh điều phối:** mọi việc script làm bằng `C` = `python <S>/scripts/chay.py ban-tin <lệnh>` (5 lệnh, đúng thứ tự dưới đây). Mỗi lệnh tự ghi nhật ký chạy và chỉ in kết quả ngắn: đọc phần in ra, không mở file kết quả. Việc không phải script (VND MCP, agent, viết, `project_write`, gửi) phiên chính tự làm rồi ghi nhật ký bằng `nhat_ky.py ghi` theo PHẦN 1 của `thu-thap.md`. `C ke-hoach` in lại danh sách bước khi cần.
 
 0. Hôm nay là thứ 2 hoặc không phải ngày sau một phiên giao dịch (nghỉ lễ) thì dừng, trả lời một dòng. Bản tin gộp mọi phiên kể từ bản tin hoặc báo cáo sâu trước (thứ 3 gộp phiên thứ 2; thứ 5 gộp thứ 3 và thứ 4).
-1. **Song song hai việc:**
-   - Phiên chính chạy lệnh lấy giá ở mục "Giá" của SKILL.md, rồi `kiem_tra_du_lieu.py` trên các file `gia_<MÃ>_ctck.csv`.
-   - Gọi **agent T (Haiku, effort low) tải trạng thái** với đúng lời giao việc ở mục "Agent T" dưới đây. Không tự gọi `project_read` trong phiên chính (nội dung file sẽ nằm lại trong ngữ cảnh suốt lần chạy).
-2. Đọc từ đĩa: `<W>/du-an/data/TOM-TAT.md` và `<W>/du-an/data/MOC-THEO-DOI.md` (mốc theo dõi, lịch sự kiện, vị trí chu kỳ và kết quả kiểm định từ phân tích sâu gần nhất). Không đọc các CSV: xử lý chúng bằng Python, chỉ in vài dòng.
-3. Lấy số VND theo mục 1.5 của SKILL.md (một lượt gọi, trước khi giao việc), rồi gọi song song **B1, B2** và bốn **agent theo mã M-MBB, M-TCB, M-CTG, M-HPG** (tất cả Haiku, effort medium) – tổng cộng 6 agent thu thập. Lời giao việc ngắn: B1, B2 theo đầu file `thu-thap.md`, agent theo mã theo đầu file `agent-ma.md` (chế độ B). Không chép quy tắc vào lời giao việc. Tin "T1" của bản tin lấy từ mục "Tin doanh nghiệp", "Sự kiện công bố", "Hệ sinh thái" của `<W>/ma/<MÃ>.md`.
-4. Gắn nhãn theo "Quy tắc chính xác" (giá và chỉ số VND đã có nhãn từ `gia_vnd.py`). Chỉ khi còn số quan trọng chưa ✔ mới gọi A5 (tối đa 10 dòng). Ghi thêm dòng vào `kiem-chung.csv`, `von-ngoai.csv`, `su-kien-nen-tang.csv`, `tham-chieu.csv` trong `<W>/du-an/` bằng Python (chỉ thêm dòng), rồi chạy `ap_luc_von_ngoai.py <W>/du-an/data/von-ngoai.csv --chu > <W>/ap_luc.txt` và `chuoi_truyen_dan.py <W>/du-an/data/von-ngoai.csv --vnindex <W>/gia/gia_VNINDEX_ctck.csv --chu > <W>/chuoi.txt` (file `von-ngoai.csv` chưa có cột `vix` thì chạy `chuoi_truyen_dan.py <file> --them-cot` một lần trước khi thêm dòng).
-5. MBB và TCB: `forecast6.py <giá> --lich-su <file dự báo của mã> --khong-kiem-chung --he-so <he_so_gian_vung phiên 6 của dự báo gần nhất trong file đó>` rồi `chart6.py <giá> --ma <MÃ> --du-bao <kết quả> --out <W>/<MÃ>-6-phien.png > <W>/<MÃ>-6-phien.txt`. File dự báo: MBB `du-an/MBB/du-bao-6-phien.json`, TCB `du-an/TCB/du-bao-6-phien-dieu-chinh.json` (TCB đã chia cổ tức cổ phiếu 100:50, GDKHQ 29/10/2026; giá từ API đã điều chỉnh). CTG, HPG chỉ cần giá so với TB20, tính từ file giá. Không chạy `cycles.py`: vị trí chu kỳ = vị trí trong `MOC-THEO-DOI.md` cộng số phiên đã qua.
-6. Viết **thân bản tin** theo mẫu vào `<W>/ban_tin.md`. **Phụ lục ghép bằng một lệnh** vào `<W>/phu_luc.md` (`cat` các file đã có dưới đúng tiêu đề của mẫu: bản chữ `chart6.py`, `ap_luc.txt`, `chuoi.txt`, file kết quả, `danh_muc_*.md`, `nguon_*.md` của B1, B2 và agent theo mã, `<W>/ma/<MÃ>.md`); phiên chính chỉ tự viết ba mục ngắn "Chưa kiểm chứng", "Đã thu thập nhưng không dùng", "Độ chính xác dự báo". Mục cuối phụ lục là `## Nhật ký chạy` (`cat <W>/nhat-ky-chay.txt`).
-7. **Lưu** (mục "Lưu" dưới đây), rồi trả lời.
+1. `C bat-dau --ma <DANH_SÁCH_MÃ> --bieu-do MBB TCB` (ngay sau khi clone code).
+2. **Song song:** gọi **agent T** (Haiku, effort low) với đúng lời giao việc ở mục "Agent T" dưới đây (không tự gọi `project_read`); trong lúc đó phiên chính gọi VND theo mục 1.5 của SKILL.md và ghi `<W>/gia/vnd.json`.
+3. Agent T xong: `C gia --phien <phiên gần nhất đã đóng cửa> --cong-cu "<tên các công cụ mcp__VND__ đã nạp>"` (thay cho lệnh `gia_vnd.py` ở mục "Giá" của SKILL.md; lệnh này chạy cả `gia_vnd.py` và `kiem_tra_du_lieu.py`). Mã thoát 2 → DỪNG theo PHẦN 3 của `thu-thap.md`.
+4. Đọc từ đĩa: `<W>/du-an/data/TOM-TAT.md` và `<W>/du-an/data/MOC-THEO-DOI.md`. Không đọc các CSV: xử lý bằng Python, chỉ in vài dòng.
+5. Gọi song song **B1, B2** và bốn **agent theo mã M-MBB, M-TCB, M-CTG, M-HPG** (Haiku, effort medium). Lời giao việc ngắn: B1, B2 theo đầu file `thu-thap.md`, agent theo mã theo đầu file `agent-ma.md` (chế độ B). File kết quả bắt buộc đúng tên: `<W>/ket_qua_B1.md`, `<W>/ket_qua_B2.md`, `<W>/tham_chieu_B2.csv`, `<W>/ma/<MÃ>.md` (lệnh `ghep` tìm đúng các tên này). Tin "T1" của bản tin lấy từ mục "Tin doanh nghiệp", "Sự kiện công bố", "Hệ sinh thái" của `<W>/ma/<MÃ>.md`.
+6. Gắn nhãn theo "Quy tắc chính xác" (giá và chỉ số VND đã có nhãn). Chỉ khi còn số quan trọng chưa ✔ mới gọi A5 (tối đa 10 dòng, ghi `<W>/kiem_chung.md`). Ghi thêm dòng vào `kiem-chung.csv`, `von-ngoai.csv`, `su-kien-nen-tang.csv`, `tham-chieu.csv` trong `<W>/du-an/` bằng Python (chỉ thêm dòng).
+7. `C tinh [--nghi yyyy-mm-dd …]`: điểm áp lực khối ngoại, chuỗi truyền dẫn (tự thêm cột `vix` nếu thiếu), dự báo 6 phiên và biểu đồ MBB, TCB (tự chọn file lịch sử dự báo và hệ số giãn vùng), giá so với TB20 của các mã còn lại (`<W>/tb20.txt`). Không chạy `cycles.py`: vị trí chu kỳ = vị trí trong `MOC-THEO-DOI.md` cộng số phiên đã qua.
+8. Viết **thân bản tin** theo mẫu vào `<W>/ban_tin.md`, phần đầu ghi chú vào `<W>/ghi_chu_dau.md` (mẫu ở mục "Lưu"), và ba mục tự viết vào `<W>/phu_luc_tu_viet.md` dưới đúng tiêu đề mẫu: `## Chưa kiểm chứng`, `## Đã thu thập nhưng không dùng`, `## Độ chính xác dự báo` (thêm nội dung cho tiêu đề mẫu khác nếu cần, ví dụ `## Tin nền tảng mới`, `## Lịch sự kiện 10 ngày tới`). Rồi `C ghep`: ghép `<W>/phu_luc.md` đúng mẫu phụ lục từ các file trên (mục thiếu ghi "(không có)") và ghép ghi chú Obsidian bản tin. Lệnh in dòng "Nhật ký: …" thì thêm dòng đó vào mục "Dữ liệu" của `ban_tin.md` và chạy lại `C ghep`.
+9. `C luu`: chép giá về lịch sử, `nen_du_lieu.py`, thêm ghi chú mới vào `NHAC-DONG-BO.md`, in danh sách file cần lưu. Phiên chính `project_write` (với `local_path`) **đúng từng dòng** danh sách đó, không thêm không bớt, ghi nhật ký bước 30, rồi trả lời (bước 31).
 
 ## Agent T – tải trạng thái (lời giao việc, chép nguyên văn, thay `<S>`, `<W>`)
 
@@ -105,17 +105,11 @@ Mọi tin bị bỏ khỏi thân bản tin vẫn phải có mặt ở phụ lụ
 
 **Mỗi bản tin chỉ tạo MỘT file mới trong dự án:** ghi chú Obsidian, chứa cả thân bản tin và phụ lục. Không tạo `<ngày>-ban-tin.md`, `<ngày>-ban-tin-phu-luc.md`, `gia-bo-sung-*.csv`, file giá hay bất kỳ file theo ngày nào khác. Mọi thứ còn lại là ghi đè file trạng thái đã có.
 
-Trước khi lưu: chép `gia_<MÃ>_ctck.csv` thành `<W>/du-an/data/<MÃ>.csv` và `gia_VNINDEX_ctck.csv`, `gia_VN30_ctck.csv` thành `<W>/du-an/data/VNINDEX.csv`, `VN30.csv` (lịch sử giá duy nhất, PHẢI ghi lại mỗi lần chạy), rồi chạy `python scripts/nen_du_lieu.py --thu-muc <W>/du-an --ngay <hôm nay>`.
-
-Ghi vào dự án, dưới `claude/chung-khoan/`:
-1. `obsidian/Bản tin/<yyyy-mm-dd> Bản tin.md` (file mới duy nhất, xem dưới).
-2. Các file trạng thái đã đổi (ghi đè): `data/kiem-chung.csv`, `data/von-ngoai.csv`, `su-kien-nen-tang.csv`, `data/tham-chieu.csv`, hai file dự báo của MBB và TCB, `data/TOM-TAT.md`, `data/<MÃ>.csv` của từng mã, `data/VNINDEX.csv`, `data/VN30.csv`, `data/vnd-cong-cu.txt`, và file `luu-tru/<tên>.csv` nào `nen_du_lieu.py` liệt kê trong `can_ghi_lai_vao_du_an` (mỗi nhật ký chỉ có một file lưu trữ; dòng trong đó chờ được chuyển vào vault khi đồng bộ Obsidian).
-3. `NHAC-DONG-BO.md` sau khi thêm MỘT dòng `- Bản tin/<yyyy-mm-dd> Bản tin.md (cập nhật <yyyy-mm-dd>)` vào mục "Đang chờ đồng bộ" bằng một lệnh Python (không viết lại file).
+`C luu` làm phần chuẩn bị (chép `gia_<MÃ>_ctck.csv` về `<W>/du-an/data/<MÃ>.csv`, `VNINDEX.csv`, `VN30.csv` – lịch sử giá duy nhất; `nen_du_lieu.py`; thêm dòng `- Bản tin/<yyyy-mm-dd> Bản tin.md (cập nhật <yyyy-mm-dd>)` vào mục "Đang chờ đồng bộ" của `NHAC-DONG-BO.md`) và in danh sách file **mới hoặc đã đổi** so với lúc agent T tải xong. Danh sách đó thường gồm: ghi chú Obsidian bản tin (file mới duy nhất), các nhật ký CSV, hai file dự báo của MBB và TCB, `data/TOM-TAT.md`, `data/<MÃ>.csv`, `data/VNINDEX.csv`, `data/VN30.csv`, `data/vnd-cong-cu.txt`, file `luu-tru/<tên>.csv` do `nen_du_lieu.py` tạo, `NHAC-DONG-BO.md`. Thiếu file nào trong số này (ví dụ lịch sử giá) nghĩa là bước trước đã lỗi: xem nhật ký.
 
 Không ghi gì khác; **không sửa ghi chú Obsidian sống** (`Mã/`, `Vĩ mô & dòng vốn/`, `00 Tổng quan.md`): phân tích sâu sẽ cập nhật chúng. Bản tin đã lưu không bao giờ bị sửa. Ghi chú bản tin cũ hơn 14 ngày được skill `dong-bo-obsidian` xóa khỏi dự án sau khi đã có trong vault; bản tin sáng không tự xóa file nào.
 
-**Ghi chú Obsidian của bản tin** = phần đầu (phiên chính viết vào `<W>/ghi_chu_dau.md`, ngắn, không bảng) + thân bản tin nguyên văn + phụ lục nguyên văn, ghép bằng MỘT lệnh, không viết lại:
-`cat <W>/ghi_chu_dau.md <W>/ban_tin.md <W>/phu_luc.md > "<W>/du-an/obsidian/Bản tin/<yyyy-mm-dd> Bản tin.md"`
+**Ghi chú Obsidian của bản tin** = phần đầu (`<W>/ghi_chu_dau.md`, ngắn, không bảng) + thân bản tin nguyên văn + phụ lục nguyên văn; `C ghep` ghép thành `<W>/du-an/obsidian/Bản tin/<yyyy-mm-dd> Bản tin.md`, không viết lại.
 
 Phần đầu:
 ```
