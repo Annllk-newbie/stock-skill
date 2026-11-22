@@ -11,10 +11,11 @@ Chế độ: ban-tin (bản tin sáng) · sau (phân tích sâu bản đầy đ�
         → tạo nhật ký, ghi bước 01, in kế hoạch các bước của chế độ (ke-hoach)
     python research/skill/scripts/chay.py <chế độ> gia --phien yyyy-mm-dd --cong-cu "<tên công cụ mcp__VND__, cách nhau dấu phẩy>"
         → (sau khi agent T đã tải dự án và <W>/gia/vnd.json đã ghi) bước 04 gia_vnd.py, 05 kiem_tra_du_lieu.py.
-          Mã thoát 2 = DỪNG cả lần chạy (PHẦN 3 thu-thap.md).
+          Mã thoát 2 = DỪNG cả lần chạy (mục "Khi DỪNG" của phien-chinh.md).
     python research/skill/scripts/chay.py <chế độ> tinh [--nghi yyyy-mm-dd …] [--kich-ban MBB=3:2 …]
         → (sau khi gắn nhãn và ghi nhật ký CSV) ban-tin: bước 20–23 (+ TB20 các mã không có biểu đồ);
-          sau/sau-nhe: bước 24 chay_sau.py.
+          sau/sau-nhe: ghép sự kiện mới (ma/su_kien_<MÃ>.csv, su_kien_A2.csv, su_kien_A3.csv) vào
+          du-an/<MÃ>/su-kien.csv rồi bước 24 chay_sau.py.
     python research/skill/scripts/chay.py <chế độ> ghep
         → ban-tin: ghép <W>/phu_luc.md theo đúng mẫu phụ lục rồi ghép ghi chú Obsidian bản tin (cần <W>/ghi_chu_dau.md,
           <W>/ban_tin.md; phiên chính viết các mục tự viết vào <W>/phu_luc_tu_viet.md dưới đúng tiêu đề mẫu).
@@ -51,22 +52,22 @@ LICH_SU_DU_BAO = ("du-bao-6-phien-dieu-chinh.json", "du-bao-6-phien.json")
 KE_HOACH = [
     ("01 Tải code GitHub", "BA", "git clone (mục 0 SKILL.md) rồi `chay.py <chế độ> bat-dau`"),
     ("02 VND health và công cụ", "BA", "phiên chính: ToolSearch `mcp__VND__`, `mcp__VND__health`; ghi nhật ký"),
-    ("06 Agent T", "BA", "agent Haiku (lời giao việc ở ban-tin-sang.md), song song với 02–03; ghi nhật ký"),
-    ("03 VND lịch, giá, chỉ số, khối ngoại sàn", "BA", "phiên chính: gọi VND theo mục “Nguồn VND (MCP)” SKILL.md, ghi <W>/gia/vnd.json; ghi nhật ký"),
+    ("06 Agent T", "BA", "agent Haiku đọc the/T.md, song song với 02–03; ghi nhật ký"),
+    ("03 VND lịch, giá, chỉ số, khối ngoại sàn", "BA", "phiên chính: gọi VND theo mục 'VND MCP' của phien-chinh.md, ghi <W>/gia/vnd.json; ghi nhật ký"),
     ("04–05 Giá", "BA", "`chay.py <chế độ> gia --phien … --cong-cu …` (mã thoát 2 → DỪNG)"),
     ("07 Đồng bộ và liệt kê vault", "A", "skill dong-bo-obsidian; ghi nhật ký"),
     ("08 Chấm dự báo kỳ trước", "A", "phiên chính (phan-tich-sau.md bước 2); ghi nhật ký"),
-    ("09–10 Agent B1, B2", "B", "agent Haiku song song cùng 14–17; ghi nhật ký từng agent"),
-    ("11–13 Agent A2, A3, A4", "A", "agent Haiku song song cùng 14–17 (A4 chỉ bản đầy đủ, bản cập nhật ghi BỎ QUA)"),
-    ("14–17 Agent theo mã", "BA", "agent Haiku theo agent-ma.md; ghi nhật ký từng agent"),
-    ("18 Agent A5", "BA", "A: luôn; B: chỉ khi còn số chưa ✔ (không thì BỎ QUA)"),
-    ("19 Gắn nhãn và ghi nhật ký CSV", "BA", "phiên chính, Python; ghi nhật ký"),
+    ("09–10 Agent B1, B2", "B", "agent Haiku đọc thu-thap.md, trang-web.md, nhan.md, the/B1.md|B2.md; song song cùng 14–17; ghi nhật ký từng agent"),
+    ("11–13 Agent A2, A3, A4", "A", "agent Haiku đọc thu-thap.md, trang-web.md, nhan.md, the/A2..A4.md; song song cùng 14–17 (A4 chỉ bản đầy đủ, bản cập nhật ghi BỎ QUA)"),
+    ("14–17 Agent theo mã", "BA", "agent Haiku đọc thu-thap.md, nhan.md, agent-ma.md, the/M-<MÃ>.md; ghi nhật ký từng agent"),
+    ("18 Agent A5", "BA", "phiên chính gắn nhãn, gom số chưa ✔ vào can_kiem_chung.md; agent Haiku đọc thu-thap.md, trang-web.md, nhan.md, the/A5.md. A: luôn; B: chỉ khi còn số chưa ✔ (không thì BỎ QUA)"),
+    ("19 Gắn nhãn và ghi nhật ký CSV", "BA", "phiên chính, Python (phien-chinh.md, mục bước 18–19); ghi nhật ký"),
     ("20–24 Tính toán", "BA", "`chay.py <chế độ> tinh` (A thêm --kich-ban, --nghi nếu có)"),
-    ("25 Agent tổng hợp", "A", "agent Sonnet → <W>/bao_cao.md"),
-    ("26 Kiểm tra chéo Opus", "A", "agent Opus theo kiem-tra-cheo.md"),
+    ("25 Agent tổng hợp", "A", "agent Sonnet đọc nguyen-tac.md, nhan.md, tong-hop.md → <W>/bao_cao.md"),
+    ("26 Kiểm tra chéo Opus", "A", "agent Opus đọc kiem-tra-cheo.md"),
     ("28 Ghép", "BA", "B: viết <W>/ghi_chu_dau.md, <W>/ban_tin.md, <W>/phu_luc_tu_viet.md rồi `chay.py ban-tin ghep`; A: `chay.py sau ghep`"),
-    ("27 Agent O", "A", "agent Sonnet (sau khi ghép nhật ký vào báo cáo)"),
-    ("29 Nén và chuẩn bị lưu", "BA", "`chay.py <chế độ> luu` (A: sau agent O; viết MOC-THEO-DOI.md trước lệnh này)"),
+    ("27 Agent O", "A", "agent Sonnet đọc the/O.md (sau khi ghép nhật ký vào báo cáo)"),
+    ("29 Nén và chuẩn bị lưu", "BA", "`chay.py <chế độ> luu` (A: sau agent O; thêm dòng nhật ký dự báo và viết MOC-THEO-DOI.md trước lệnh này)"),
     ("30 Lưu vào dự án", "BA", "phiên chính: project_write từng dòng `luu` in ra; ghi nhật ký (file lỗi ghi đường dẫn)"),
     ("31 Gửi người dùng", "BA", "PushNotification / câu trả lời cuối + SendUserFile ảnh; ghi nhật ký"),
 ]
@@ -176,7 +177,7 @@ def file_lich_su(cx, ma):
 def cmd_ke_hoach(cx, che_do=None):
     che_do = che_do or cx.a.che_do
     k = "B" if che_do == "ban-tin" else "A"
-    print(f"Kế hoạch {che_do} (đúng thứ tự; tên bước trong nhật ký theo PHẦN 1 thu-thap.md):")
+    print(f"Kế hoạch {che_do} (đúng thứ tự; tên bước trong nhật ký theo mục \"Nhật ký chạy\" của phien-chinh.md):")
     for ten, ap, ai in KE_HOACH:
         if k in ap:
             print(f"- {ten}: {ai}")
@@ -246,11 +247,70 @@ def tb20(path):
     return r[-1]["date"], c[-1], tb, (c[-1] / tb - 1) * 100
 
 
+COT_SK = ["date", "event", "group", "source_url", "reliability", "note"]
+
+
+def ghep_su_kien(cx, t):
+    """Phân tích sâu: thêm sự kiện mới của agent theo mã (ma/su_kien_<MÃ>.csv) và sự kiện chung
+    (su_kien_A2.csv, su_kien_A3.csv – toàn thị trường, áp cho mọi mã) vào du-an/<MÃ>/su-kien.csv, bỏ dòng trùng."""
+    chung = []
+    for n in ("su_kien_A2.csv", "su_kien_A3.csv"):
+        chung += doc_sk(cx.p(n))
+    tong, loi = 0, []
+    for ma in t["ma"]:
+        moi = doc_sk(cx.p("ma", f"su_kien_{ma}.csv")) + chung
+        f = os.path.join(cx.DA, ma, "su-kien.csv")
+        cu = doc_sk(f)
+        co = {(r.get("date", ""), r.get("event", "").strip().lower()) for r in cu}
+        them = []
+        for r in moi:
+            k = (r.get("date", ""), r.get("event", "").strip().lower())
+            if r.get("date") and r.get("event") and k not in co:
+                co.add(k)
+                them.append(r)
+        if not them:
+            continue
+        try:
+            os.makedirs(os.path.dirname(f), exist_ok=True)
+            moi_file = not os.path.isfile(f) or os.path.getsize(f) == 0
+            cot = COT_SK
+            if not moi_file:
+                with open(f, newline="", encoding="utf-8-sig") as fi:
+                    cot = [c.strip() for c in (next(csv.reader(fi), None) or COT_SK)]
+                with open(f, "rb") as fi:
+                    fi.seek(-1, 2)
+                    thieu_xuong_dong = fi.read(1) not in (b"\n", b"\r")
+                if thieu_xuong_dong:
+                    with open(f, "a", encoding="utf-8") as fo:
+                        fo.write("\n")
+            with open(f, "a", newline="", encoding="utf-8") as fo:
+                w = csv.DictWriter(fo, fieldnames=cot, extrasaction="ignore", restval="")
+                if moi_file:
+                    w.writeheader()
+                w.writerows(them)
+            tong += len(them)
+        except OSError as e:
+            loi.append(f"{ma}: {e}")
+    if loi:
+        cx.ghi("24 chay_sau.py · ghép sự kiện", "loi", "; ".join(loi))
+    else:
+        cx.ghi("24 chay_sau.py · ghép sự kiện", "ok", f"thêm {tong} dòng sự kiện")
+
+
+def doc_sk(path):
+    try:
+        with open(path, newline="", encoding="utf-8-sig") as f:
+            return [{(k or "").strip(): (v or "").strip() for k, v in r.items()} for r in csv.DictReader(f)]
+    except OSError:
+        return []
+
+
 def cmd_tinh(cx):
     a, t = cx.a, cx.tt()
     vn = os.path.join(cx.DA, "data", "von-ngoai.csv")
     vni = os.path.join(cx.GIA, "gia_VNINDEX_ctck.csv")
     if t["che_do"] != "ban-tin":
+        ghep_su_kien(cx, t)
         args = [os.path.join(HERE, "chay_sau.py")] + t["ma"] + ["--gia-dir", cx.GIA, "--du-an", cx.DA, "--out", cx.W,
                                                               "--bieu-do"] + t["bieu_do"] + ["--nhat-ky", cx.NK]
         if a.nghi:
