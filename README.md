@@ -2,16 +2,16 @@
 
 Code của skill `stock-research-analyzer` (bản tin sáng và phân tích sâu chứng khoán). Đây là nguồn duy nhất: mỗi lần chạy, skill trên claude.ai `git clone` kho này về `research/skill`.
 
-- `references/` – hướng dẫn, chia theo người đọc (mỗi người chỉ đọc đúng phần của mình):
-  - phiên chính: `phien-chinh.md` (điều phối, VND, giá, nhật ký, khi dừng) + `nguyen-tac.md` + `nhan.md` + file của chế độ `ban-tin-sang.md` hoặc `phan-tich-sau.md`;
-  - agent thu thập B2 (bản tin sáng; đã gộp B1), A2–A5: `thu-thap.md` (quy tắc chung, danh mục) + `trang-web.md` + `nhan.md` + thẻ `the/<tên>.md` (doanh nghiệp tham chiếu ở `the/B2.md`, tìm sự kiện quá khứ ở `the/A2.md`);
-  - agent theo mã: `thu-thap.md` + `nhan.md` + `agent-ma.md` (phần chung) + `the/M-<MÃ>.md` (`trang-web.md` khi cần). Bản tin sáng: MỘT agent `M` làm cho mọi mã; phân tích sâu: mỗi mã một agent `M-<MÃ>`;
-  - agent T: `the/T.md` · agent O: `the/O.md` · tổng hợp: `nguyen-tac.md` + `nhan.md` + `tong-hop.md` · kiểm tra chéo Opus: `kiem-tra-cheo.md`.
-  - Một quy tắc chỉ nằm ở MỘT file; file khác nhắc tới thì trỏ sang, không chép lại.
+- `references/` – hướng dẫn, đúng 4 file (mỗi người đọc đúng phần của mình):
+  - `nguyen-tac.md`: nguyên tắc và nhãn ✔ ◐ ✖ ⊘ – mọi phiên và mọi agent đọc;
+  - `phien-chinh.md`: phiên chính – phần chung (VND, giá, nhật ký, khi dừng, dự báo xác suất) + mục "Chế độ B: Bản tin sáng" + mục "Chế độ A: Phân tích sâu";
+  - `thu-thap.md`: agent T và mọi agent thu thập – quy tắc chung, danh mục, trang web, phần theo mã, và các thẻ (T, B2, A2, A3, A4, A5, M-<MÃ>). Agent B (bản tin) làm B2 + mọi mã; A-chung làm A2–A4; A-ma làm mọi mã;
+  - `tong-hop.md`: agent tổng hợp, kiểm tra chéo Opus, agent O (ghi chú Obsidian).
+  - Một quy tắc chỉ nằm ở MỘT chỗ; chỗ khác nhắc tới thì trỏ sang, không chép lại.
 - `scripts/` (chạy với `--help` để xem tham số):
   - điều phối: `chay.py` (một lệnh cho mỗi chặng: `bat-dau`, `gia`, `tinh`, `ghep`, `luu`, `ke-hoach`) · `nhat_ky.py` (nhật ký chạy từng bước, gợi ý sửa lỗi) · `chay_sau.py` (mọi script phân tích sâu cho mọi mã);
   - dữ liệu: `gia_vnd.py` (giá và chỉ số từ VND: lịch sử trong dự án + phiên mới, điều chỉnh sự kiện quyền, theo dõi thông báo và công cụ VND) · `kiem_tra_du_lieu.py` (kiểm tra file giá) · `du_an.py` (lưu file dự án ra đĩa đúng từng byte) · `nen_du_lieu.py` (nén nhật ký sang `luu-tru/<tên>.csv`, viết `TOM-TAT.md`);
-  - bản tin và phân tích: `forecast6.py` (vùng giá 6 phiên, chấm dự báo cũ) · `chart6.py` (biểu đồ 6 phiên kèm bản chữ) · `ap_luc_von_ngoai.py` (điểm áp lực khối ngoại) · `chuoi_truyen_dan.py` (chuỗi truyền dẫn vĩ mô);
+  - bản tin và phân tích: `du_bao_xs.py` (xác suất tăng 5/20 phiên + vùng 80%, tự kiểm chứng trên lịch sử và tự chấm dự báo cũ trong `data/du-bao-xs.json`; thay cho kịch bản chính tự viết) · `forecast6.py` (vùng giá 6 phiên, chấm dự báo cũ) · `chart6.py` (biểu đồ 6 phiên kèm bản chữ) · `ap_luc_von_ngoai.py` (điểm áp lực khối ngoại) · `chuoi_truyen_dan.py` (chuỗi truyền dẫn vĩ mô);
   - chỉ phân tích sâu: `cycles.py` (chu kỳ) · `kiem_dinh.py` (`chu-ky`, `su-kien`, `du-bao`, `fdr`) · `risk.py` (rủi ro theo khung nắm giữ) · `indicators.py` (chỉ báo, khối `doc_bieu_do`) · `event_study.py` (căn giá theo ngày sự kiện) · `chart.py` (biểu đồ dài hạn, chỉ khi người dùng hỏi) · `common.py` (hàm đọc CSV dùng chung; phải nằm cùng thư mục với `indicators.py`, `cycles.py`).
 - Dữ liệu (giá, nhật ký, báo cáo) KHÔNG nằm ở đây: nằm trong Project "Economy and trading" và vault Obsidian.
 
@@ -50,20 +50,17 @@ Các bước còn lại (VND MCP, agent, viết lời văn, `project_write`, g�
 - **03 VND lịch, giá, chỉ số, khối ngoại sàn** – MCP `get_trading_calendar`, `get_stock_price_by_date`, `get_vnmarket_prices` (mỗi chỉ số một lần), `get_foreign_trading` (VNINDEX), `get_change_prices` (Brent, vàng). Ghi `<W>/gia/vnd.json`.
 - **04 gia_vnd.py** – đọc `<W>/gia/vnd.json`, `<W>/du-an/data/<MÃ>.csv`, `VNINDEX.csv`, `VN30.csv`, `vnd-cong-cu.txt`. Ghi `<W>/gia/gia_<MÃ>_ctck.csv`, `gia_VNINDEX_ctck.csv`, `gia_VN30_ctck.csv`, `<W>/gia/ket-qua.json`. Mã thoát 2 → DỪNG (mục "Khi DỪNG" của `phien-chinh.md`). Cần bước 06 xong trước (lịch sử giá).
 - **05 kiem_tra_du_lieu.py** – đọc các file `gia_*_ctck.csv`. Có `loi` thì phiên đó không dùng cho dự báo.
-- **06 Agent T** (Haiku) – `project_read` các file dự án, rồi `du_an.py luu` ghi ra `<W>/du-an/` (cùng cấu trúc với dự án). Danh sách file: `the/T.md` (chế độ A thêm file). Lỗi → bước sau báo "Thiếu file".
+- **06 Agent T** (Haiku) – `project_read` các file dự án, rồi `du_an.py luu` ghi ra `<W>/du-an/` (cùng cấu trúc với dự án). Danh sách file: Thẻ T của `thu-thap.md` (chế độ A thêm file). Lỗi → bước sau báo "Thiếu file".
 
 ### Chỉ phân tích sâu
 - **07 Đồng bộ và liệt kê vault** – skill `dong-bo-obsidian`, máy tính của người dùng. Ghi ghi chú người dùng tự sửa vào `<W>/vault/`. Máy tắt → CẢNH BÁO, chạy tiếp bằng dữ liệu dự án.
 - **08 Chấm dự báo kỳ trước** – đọc `<W>/du-an/<MÃ>/nhat-ky-du-bao.md` và giá mới; ghi thêm dòng Đúng/Sai/Chưa rõ vào cuối file đó.
 
-### Thu thập (Haiku, chạy song song)
-Hướng dẫn: `thu-thap.md` + `trang-web.md` + `nhan.md` + thẻ `the/<tên>.md` (agent theo mã: thêm `agent-ma.md`, `the/M-<MÃ>.md`). Mỗi agent ghi file kết quả của mình, `danh_muc_<agent>.md` và `nguon_<agent>.md` trong `<W>`.
-- **09 Agent B2** (B; agent thu thập duy nhất của bản tin, đã gộp B1) – dòng tiền Việt Nam (tự doanh, tỷ giá, USD, liên ngân hàng, OMO), tin chung, quốc tế đêm qua, lịch 3 phiên, doanh nghiệp tham chiếu. Ghi `ket_qua_B2.md` (mục `## Dòng tiền Việt Nam`, `## Tin chung`, `## Quốc tế đêm qua`, `## Lịch 3 phiên tới`), `tham_chieu_B2.csv`.
-- **10 Agent M** (B) – MỘT agent làm lần lượt mọi mã theo mục "Chế độ B" của `agent-ma.md`. Ghi `<W>/ma/<MÃ>.md`, `<W>/ma/su_kien_<MÃ>.csv` cho từng mã, `danh_muc_M.md`, `nguon_M.md`.
-- **11 Agent A2** (A) – lịch 10 ngày, sự kiện quá khứ chung, tham chiếu. Ghi `ket_qua_A2.md`, `su_kien_A2.csv`, `tham_chieu_A2.csv`.
-- **12 Agent A3** (A) – tự doanh, ngành, vĩ mô, quốc tế, Fed, ETF, khu vực. Ghi `ket_qua_A3.md` (và `su_kien_A3.csv` nếu có).
-- **13 Agent A4** (chỉ Ađ; Ac ghi BỎ QUA) – NHNN, trái phiếu, đầu tư công và FDI. Ghi `ket_qua_A4.md`.
-- **14–17 Agent M-MBB, M-TCB, M-CTG, M-HPG** (chỉ A; mỗi mã một agent) – tự gọi VND phần theo mã. Ghi `<W>/ma/<MÃ>.md`, `<W>/ma/su_kien_<MÃ>.csv`.
+### Thu thập (Haiku)
+Hướng dẫn: `nguyen-tac.md` + `thu-thap.md` (mục "Agent nào làm thẻ nào"). File kết quả giữ tên theo thẻ (`ket_qua_<thẻ>.md`, `danh_muc_<thẻ>.md`, `nguon_<thẻ>.md`) để `chay.py ghep` tìm thấy.
+- **09 Agent B** (B; agent thu thập duy nhất của bản tin) – làm thẻ B2 (dòng tiền Việt Nam, tin chung, quốc tế đêm qua, lịch 3 phiên, doanh nghiệp tham chiếu → `ket_qua_B2.md`, `tham_chieu_B2.csv`) rồi phần theo mã cho mọi mã (→ `<W>/ma/<MÃ>.md`, `<W>/ma/su_kien_<MÃ>.csv`, `danh_muc_M.md`, `nguon_M.md`).
+- **11 Agent A-chung** (A) – lần lượt thẻ A2 (lịch 10 ngày, sự kiện quá khứ chung, tham chiếu → `ket_qua_A2.md`, `su_kien_A2.csv`, `tham_chieu_A2.csv`), A3 (tự doanh, ngành, vĩ mô, quốc tế, Fed, ETF, khu vực → `ket_qua_A3.md`, `su_kien_A3.csv`), A4 (chỉ bản đầy đủ: NHNN, trái phiếu, đầu tư công và FDI → `ket_qua_A4.md`).
+- **14 Agent A-ma** (A; song song với 11) – phần theo mã cho mọi mã, tự gọi VND phần theo mã (→ `<W>/ma/<MÃ>.md`, `<W>/ma/su_kien_<MÃ>.csv`, `danh_muc_M-<MÃ>.md`, `nguon_M-<MÃ>.md`).
 - **18 Agent A5** – đọc `<W>/can_kiem_chung.md`, tìm nguồn thứ hai, ghi `<W>/kiem_chung.md`. A: luôn chạy; B: chỉ khi còn số chưa ✔, không thì BỎ QUA.
 - **19 Gắn nhãn và ghi nhật ký CSV** – phiên chính, Python. Thêm dòng vào `<W>/du-an/data/kiem-chung.csv`, `von-ngoai.csv`, `tham-chieu.csv`, `<W>/du-an/su-kien-nen-tang.csv` (A thêm `<W>/du-an/<MÃ>/su-kien.csv`).
 
@@ -71,17 +68,18 @@ Hướng dẫn: `thu-thap.md` + `trang-web.md` + `nhan.md` + thẻ `the/<tên>.m
 - **20 ap_luc_von_ngoai.py** (B) – đọc `von-ngoai.csv`, ghi `<W>/ap_luc.txt`.
 - **21 chuoi_truyen_dan.py** (B) – đọc `von-ngoai.csv`, `gia_VNINDEX_ctck.csv`, ghi `<W>/chuoi.txt`.
 - **22–23 forecast6/chart6 MBB, TCB** (B) – đọc file giá và lịch sử dự báo (`MBB/du-bao-6-phien.json`, `TCB/du-bao-6-phien-dieu-chinh.json`). Ghi `<W>/<MÃ>-6-phien.png`, `<W>/<MÃ>-6-phien.txt`, thêm dòng vào lịch sử dự báo.
+- **25a du_bao_xs.py** (B và A, trong `chay.py tinh`) – đọc mọi `gia_<MÃ>_ctck.csv` và `gia_VNINDEX_ctck.csv`, chấm rồi ghi thêm vào `<W>/du-an/data/du-bao-xs.json`; ghi `<W>/du_bao_xs.txt`, `<W>/du_bao_xs.json` (A: nối vào cuối `tom_tat_script.md`).
 - **24 chay_sau.py** (A) – `chay.py tinh` trước tiên ghép sự kiện mới (`ma/su_kien_<MÃ>.csv`, `su_kien_A2.csv`, `su_kien_A3.csv`) vào `<W>/du-an/<MÃ>/su-kien.csv`, rồi một lệnh chạy cycles, indicators, risk, kiem_dinh, forecast6, chart6, ap_luc, chuoi cho mọi mã; mỗi script con ghi một dòng nhật ký riêng (`chay_sau · <MÃ> <script>`). Ghi `<W>/<MÃ>/*.json`, `<W>/tom_tat_script.md`, `<W>/moc_nhap.md`, `<W>/ap_luc.txt`, `<W>/chuoi.txt`.
 
 ### Viết và kiểm tra (chỉ A cho 25–27)
-- **25 Agent tổng hợp** (Sonnet) – `nguyen-tac.md`, `nhan.md`, `tong-hop.md`. Đọc `tom_tat_script.md`, kết quả thu thập, `<W>/vault/`. Ghi `<W>/bao_cao.md`.
-- **26 Kiểm tra chéo Opus** – `kiem-tra-cheo.md`. Đọc `bao_cao.md` và các JSON. Có lỗi thì gửi lại agent 25 sửa.
-- **27 Agent O** (Sonnet) – `the/O.md`. Ghi `<W>/du-an/obsidian/Báo cáo sâu/<ngày> Phân tích sâu.md` và sửa các ghi chú sống (`Mã/`, `Vĩ mô & dòng vốn/`, `00 Tổng quan.md`).
+- **25 Agent tổng hợp** (Sonnet) – `nguyen-tac.md`, `tong-hop.md`. Đọc `tom_tat_script.md`, kết quả thu thập, `<W>/vault/`. Ghi `<W>/bao_cao.md`.
+- **26 Kiểm tra chéo Opus** – `tong-hop.md` (mục "Kiểm tra chéo cuối cùng"). Đọc `bao_cao.md` và các JSON. Có lỗi thì gửi lại agent 25 sửa.
+- **27 Agent O** (Sonnet) – `tong-hop.md` (Thẻ O). Ghi `<W>/du-an/obsidian/Báo cáo sâu/<ngày> Phân tích sâu.md` và sửa các ghi chú sống (`Mã/`, `Vĩ mô & dòng vốn/`, `00 Tổng quan.md`).
 - **28 Viết bản tin/báo cáo và phụ lục** – B: `<W>/ban_tin.md`, `<W>/phu_luc.md`, ghép thành `<W>/du-an/obsidian/Bản tin/<ngày> Bản tin.md`. A: nối `bao_cao.md` vào ghi chú báo cáo. Cuối phụ lục/báo cáo luôn có "Nhật ký chạy".
 
 ### Lưu và gửi
 - **29 nen_du_lieu.py** – đọc các nhật ký CSV trong `<W>/du-an/`. Ghi `data/TOM-TAT.md`, chuyển dòng cũ sang `luu-tru/<tên>.csv`, in danh sách `can_ghi_lai_vao_du_an`.
-- **30 Lưu vào dự án** – `project_write` với `local_path`, đúng danh sách ở mục "Lưu" của `ban-tin-sang.md` / `phan-tich-sau.md`. Mỗi lần chạy chỉ một file mới (ghi chú Obsidian); còn lại ghi đè. File nào lỗi thì ghi đường dẫn file đó vào nhật ký.
+- **30 Lưu vào dự án** – `project_write` với `local_path`, đúng danh sách ở mục "Lưu" của chế độ trong `phien-chinh.md`. Mỗi lần chạy chỉ một file mới (ghi chú Obsidian); còn lại ghi đè. File nào lỗi thì ghi đường dẫn file đó vào nhật ký.
 - **31 Gửi người dùng** – PushNotification hoặc câu trả lời cuối, kèm ảnh `MBB-6-phien.png`, `TCB-6-phien.png` (SendUserFile).
 
 ### Nơi dữ liệu sống

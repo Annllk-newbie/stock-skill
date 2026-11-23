@@ -7,7 +7,7 @@ Trạng thái: OK · CẢNH BÁO (chạy được nhưng thiếu/◐) · LỖI (
 Cách dùng (mặc định file research/nhat-ky-chay.txt, đổi bằng --file):
     python nhat_ky.py bat-dau --tieu-de "Bản tin sáng 2026-11-24" --phien-ban "dc9be80 2026-11-22"
     python nhat_ky.py ghi --buoc "02 VND health" --trang-thai ok --chi-tiet "16 công cụ"
-    python nhat_ky.py ghi --buoc "09 Agent B2" --trang-thai loi --chi-tiet "<nguyên văn lỗi>"
+    python nhat_ky.py ghi --buoc "09 Agent B" --trang-thai loi --chi-tiet "<nguyên văn lỗi>"
     python nhat_ky.py chay --buoc "04 gia_vnd.py" --dung-khi-ma 2 -- python scripts/gia_vnd.py ... > ket-qua.json
     python nhat_ky.py tom-tat            # in tóm tắt: số bước theo trạng thái + mọi dòng không OK
 
@@ -37,7 +37,7 @@ GOI_Y = [
     (r"ModuleNotFoundError: No module named '([\w.]+)'",
      "Thiếu thư viện {0}: chạy `pip install {0} --break-system-packages` rồi chạy lại bước này."),
     (r"URL_NOT_ON_ALLOWLIST",
-     "WebFetch chặn URL gõ tay: WebSearch trước rồi fetch đúng link trả về (trang-web.md)."),
+     "WebFetch chặn URL gõ tay: WebSearch trước rồi fetch đúng link trả về (mục Trang web của thu-thap.md)."),
     (r"throttl|429|rate limit|too many requests",
      "Bị giới hạn tần suất: chờ 20 giây rồi gọi lại MỘT lần."),
     (r"timed? ?out|timeout|hết thời gian",
@@ -55,7 +55,7 @@ GOI_Y = [
     (r"No such file|FileNotFoundError|không có file|không tìm thấy|not found",
      "Thiếu file: kiểm đường dẫn trong lệnh và agent T đã tải file đó chưa (dòng JSON `da_luu`)."),
     (r"Permission denied|403|Forbidden",
-     "Bị chặn quyền truy cập: trang/thư mục không cho đọc – đổi nguồn (trang-web.md) hoặc kiểm quyền thư mục."),
+     "Bị chặn quyền truy cập: trang/thư mục không cho đọc – đổi nguồn (mục Trang web của thu-thap.md) hoặc kiểm quyền thư mục."),
     (r"Traceback|Error",
      "Lỗi trong script: chạy riêng lệnh này để xem lỗi đầy đủ, rồi gửi dòng nhật ký này cho Claude để sửa trên GitHub."),
 ]
