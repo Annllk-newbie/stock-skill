@@ -111,7 +111,7 @@ Mục tiêu: **một màn hình điện thoại** (thân bản tin tối đa kho
 
 ### Quy trình (`C` = `python <S>/scripts/chay.py ban-tin`)
 
-0. Hôm nay là thứ 2 hoặc không phải ngày sau một phiên giao dịch (nghỉ lễ) thì dừng, trả lời một dòng. Bản tin gộp mọi phiên kể từ bản tin hoặc báo cáo sâu trước (thứ 3 gộp phiên thứ 2; thứ 5 gộp thứ 3 và thứ 4).
+0. Hôm nay là thứ 2 hoặc không phải ngày sau một phiên giao dịch (nghỉ lễ) thì dừng, trả lời một dòng. Bản tin chạy sáng thứ 3, 4, 5, 6 và gộp mọi phiên kể từ bản tin hoặc báo cáo sâu trước (thứ 3 gộp phiên thứ 2; ngày nào lỡ chạy thì bản kế tiếp gộp bù).
 1. `C bat-dau --ma <DANH_SÁCH_MÃ> --bieu-do <các mã có biểu đồ>` (ngay sau khi clone code).
 2. **Song song:** gọi agent T (chế độ B); trong lúc đó gọi VND theo mục "VND MCP" và ghi `<W>/gia/vnd.json`.
 3. Agent T xong: `C gia --phien <phiên gần nhất đã đóng cửa> --cong-cu "<tên các công cụ mcp__VND__ đã nạp>"`. Mã thoát 2 → bù phiên thiếu hoặc DỪNG theo mục "Khi DỪNG".
