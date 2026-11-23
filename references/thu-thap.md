@@ -60,7 +60,7 @@ Khảo sát 14/11/2026, chỉ giữ trang tin cậy trung bình đến cao và �
 | nso.gov.vn (link `?p=` hoặc PDF) | CPI, GDP, sản xuất | Cao (gốc) | Vĩ mô |
 | sbv.gov.vn (PDF báo cáo tuần) | Lãi suất liên ngân hàng, tỷ giá trung tâm | Cao (gốc), hay chậm | Vĩ mô, ngân hàng |
 | federalreserve.gov | Quyết định, biên bản FOMC | Cao (gốc) | Fed |
-| fred.stlouisfed.org (/series, /data/<MÃ CHUỖI>, dùng `offset` để tới số mới) | Lợi suất Mỹ, breakeven, chuỗi lịch sử | Cao | Mỹ |
+| fred.stlouisfed.org (/series/<MÃ CHUỖI>; bảng chuỗi ở mục dưới) | Lợi suất Mỹ, breakeven, VIX, S&P 500, Nasdaq, Dow, Nikkei 225, Brent | Cao (chậm ~1 ngày) | Mỹ, Nhật, VIX |
 | 24hmoney.vn (/stock/<MÃ>) | Tin, sự kiện theo mã | Trung bình-cao | Tin doanh nghiệp (không lấy giá hay khối ngoại) |
 | stockbiz.vn (/stocks/<MÃ>/trading, nguồn FireAnt) | Tự doanh (tỷ đồng) | Trung bình-cao; tự doanh phiên mới nhất coi là chưa chắc | Chỉ tự doanh |
 | cafef.vn (trang sự kiện theo mã, bài tin) | Sự kiện doanh nghiệp, tin | Trung bình-cao (báo lại) | Tin T1, sự kiện quá khứ |
@@ -69,12 +69,19 @@ Khảo sát 14/11/2026, chỉ giữ trang tin cậy trung bình đến cao và �
 | vietnamplus.vn, vov.vn, baodauthau.vn | CPI, FDI, đầu tư công | Trung bình-cao (báo lại số chính thức) | Vĩ mô |
 | uk.investing.com | S&P 500 có ngày | Trung bình-cao | Mỹ |
 | kitco.com | Giá vàng (đối chiếu số VND) | Trung bình-cao | Hàng hóa |
-| tradingeconomics.com (/news/..., /commodity/iron-ore) | DXY, quặng sắt | Trung bình | Mỹ, HPG đầu vào |
+| tradingeconomics.com (/news/..., /commodity/iron-ore, /commodity/hrc-steel) | DXY, quặng sắt, thép HRC | Trung bình (cấp 2, không dùng một mình) | Mỹ, HPG đầu vào khi VND trả 0 |
 | etfcentral.com (/fund/VNM) | AUM, dòng vốn ETF VNM có ngày | Trung bình | ETF |
 
 **Không dùng làm số chốt:** hnx.vn, vsd.vn (chặn robot); ssc.gov.vn, congbothongtin.ssc.gov.vn, treasury.gov TextView, CME FedWatch (khung JS, không có số); nhadautu.vn, ndh.vn, ssi.com.vn, vietnamnews.vn (lỗi fetch); finance.vietstock.vn (che số ở tài khoản Free); simplize.vn (chỉ phiên chính dùng để đối chiếu khi `gia_vnd.py` báo điều chỉnh giá); CafeF DuLieu, BSC, TradingView, 24hmoney trang khối ngoại toàn sàn (trống hoặc sai); etfdb, stockanalysis.com (cũ); báo cáo CTCK có dự phóng cũ (không phải kết quả thật); Yahoo Finance cho cổ phiếu Việt Nam; trang không ghi đơn vị phát hành, ngày đăng hay nguồn số liệu; trang tổng hợp bằng AI; diễn đàn.
 
-**Chưa có nguồn đọc được ổn định (ghi "chưa có số liệu", không điền bằng nguồn cũ):** tự doanh theo mã ổn định, lãi suất điều hành, lợi suất trái phiếu VN thứ cấp mới, xác suất FedWatch, VIX (chỉ có khi bài AP/CNBC/Reuters nêu), chỉ số châu Á.
+**Chưa có nguồn đọc được ổn định (ghi "chưa có số liệu", không điền bằng nguồn cũ):** tự doanh theo mã ổn định, lãi suất điều hành, lợi suất trái phiếu VN thứ cấp mới, xác suất FedWatch (chỉ có số do Reuters/CNBC/Investing trích lại, luôn ◐), chỉ số châu Á ngoài Nikkei.
+
+### Bảng chuỗi FRED (V2, F1; dùng cho thẻ B2 và A3)
+Mỗi chuỗi: WebSearch "FRED <MÃ CHUỖI>" rồi WebFetch đúng link `fred.stlouisfed.org/series/<MÃ CHUỖI>` trả về (trang có 5 quan sát mới nhất kèm ngày). FRED đăng số **chậm khoảng một ngày**: chỉ lấy dòng có **ngày quan sát đúng phiên cần lấy**; chưa có thì ghi "FRED chưa cập nhật phiên dd/mm" và dùng nguồn tin. Dòng "." là ngày nghỉ, không phải số 0.
+- Cấp 1 (Fed, Bộ Tài chính Mỹ công bố, một nguồn là đủ ✔): lợi suất Mỹ 10 năm `DGS10`, 2 năm `DGS2`, breakeven 5 năm `T5YIE`.
+- Cấp 2 (FRED đăng lại số của bên cung cấp; cần thêm một nguồn khớp mới ✔): S&P 500 `SP500`, Nasdaq Composite `NASDAQCOM`, Dow Jones `DJIA`, Nikkei 225 `NIKKEI225`, VIX `VIXCLS`, Brent `DCOILBRENTEU` (chỉ để đối chiếu số VND, không thay VND).
+- Không dùng FRED làm DXY: chỉ số USD của FRED (`DTWEXBGS`) là định nghĩa khác, không ghi vào cột `dxy`.
+- Hang Seng, Shanghai, Kospi: FRED không có số ngày; lấy từ AP/Reuters/Nikkei Asia/Yonhap/SCMP như cũ.
 
 **Nguồn dự phòng nước ngoài** (thứ tự thử: trang Việt Nam trong bảng → trang Việt Nam khác → dưới đây; trang nào hai lần liền không đọc được thì ghi chú để người dùng cập nhật):
 - **Tỷ giá trung tâm, liên ngân hàng, tự do:** bản tin "SNAPSHOT-Vietnam dong" của Reuters (tìm "SNAPSHOT Vietnam dong <ngày>"). Giá USD Vietcombank chỉ lấy từ vietcombank.com.vn hoặc báo Việt Nam; không được thì ⊘.
@@ -136,7 +143,7 @@ Việc:
 3. L1 cho 3 phiên tới (chỉ sự kiện mới công bố so với lịch trong `TOM-TAT.md`/`MOC-THEO-DOI.md`), và đúng sự kiện F1/F2 phiên chính nêu.
 4. R1 – doanh nghiệp và ngành tham chiếu (mục dưới): tối đa 8 tin, chỉ tin mới.
 
-**Nguồn:** tự doanh: stockbiz.vn → CafeF / Vietstock / Tin nhanh chứng khoán; tỷ giá, liên ngân hàng, OMO: sbv.gov.vn → báo tài chính (thoibaotaichinhvietnam.vn, thitruongtaichinhtiente.vn, thoibaonganhang.vn), dự phòng Reuters "SNAPSHOT-Vietnam dong"; V2: AP / Reuters / CNBC / MarketWatch; Nikkei Asia, Yonhap, SCMP → Investing.com (uk.investing.com); breakeven: fred.stlouisfed.org chuỗi `T5YIE` (cấp 1, chậm một ngày); L1: Tin nhanh chứng khoán, vsd.vn, federalreserve.gov; tin chung và R1: trang ưu tiên ở `thu-thap.md` (mục "Trang web").
+**Nguồn:** tự doanh: stockbiz.vn → CafeF / Vietstock / Tin nhanh chứng khoán; tỷ giá, liên ngân hàng, OMO: sbv.gov.vn → báo tài chính (thoibaotaichinhvietnam.vn, thitruongtaichinhtiente.vn, thoibaonganhang.vn), dự phòng Reuters "SNAPSHOT-Vietnam dong"; V2: FRED trước cho các chuỗi trong "Bảng chuỗi FRED" (lợi suất, breakeven, VIX, S&P 500, Nasdaq, Nikkei), rồi AP / Reuters / CNBC / MarketWatch làm nguồn thứ hai và cho số FRED chưa cập nhật; Hang Seng, Shanghai: Nikkei Asia, Yonhap, SCMP → Investing.com (uk.investing.com); L1: Tin nhanh chứng khoán, vsd.vn, federalreserve.gov; tin chung và R1: trang ưu tiên ở `thu-thap.md` (mục "Trang web").
 
 Ghi: `<W>/ket_qua_B2.md` (bốn mục đúng tên: `## Dòng tiền Việt Nam` (mỗi số một dòng: mục · cột von-ngoai · giá trị · ngày · nguồn 1 · nguồn 2), `## Tin chung`, `## Quốc tế đêm qua`, `## Lịch 3 phiên tới`), `<W>/tham_chieu_B2.csv` (đúng cột của `tham-chieu.csv`), `danh_muc_B2.md`, `nguon_B2.md`.
 
@@ -187,7 +194,7 @@ Việc: tự doanh (phần tự doanh của G3), T2 (phần chung của ngành),
 
 **Câu tìm mẫu:** "FOMC <tháng năm> decision statement", "Fed <tháng> hike probability FedWatch", "US economic calendar <tháng năm> CPI PCE jobs"; "dòng vốn ETF tuần <dd/mm> Việt Nam", "Fubon FTSE Vietnam outflow <tháng năm>"; "foreign investors Asian markets last week MIDF".
 
-**Nguồn:** tự doanh: stockbiz.vn → CafeF / Vietstock / Tin nhanh chứng khoán; T2: trang ưu tiên; V1: sbv.gov.vn → báo tài chính; V2: AP / Reuters / CNBC / MarketWatch; Nikkei Asia, Yonhap, SCMP → Investing.com; breakeven: fred.stlouisfed.org `T5YIE`; F6: VnEconomy (bài ETF tuần), index.vn, The Investor, etfcentral.com; F7: báo cáo tuần MIDF (qua Bernama, NST), Reuters.
+**Nguồn:** tự doanh: stockbiz.vn → CafeF / Vietstock / Tin nhanh chứng khoán; T2: trang ưu tiên; V1: sbv.gov.vn → báo tài chính; V2 và lợi suất của F1: FRED trước theo "Bảng chuỗi FRED", rồi AP / Reuters / CNBC / MarketWatch; Hang Seng, Shanghai, Kospi: Nikkei Asia, Yonhap, SCMP → Investing.com; F6: VnEconomy (bài ETF tuần), index.vn, The Investor, etfcentral.com; F7: báo cáo tuần MIDF (qua Bernama, NST), Reuters.
 
 Ghi: `<W>/ket_qua_A3.md` (một mục `##` cho mỗi mã danh mục: G3, T2, V1, V2, F1, F6, F7), `danh_muc_A3.md`, `nguon_A3.md`. Sự kiện có ngày tìm thấy (Fed, ngành) ghi thêm `<W>/su_kien_A3.csv` cùng cột với `su_kien_A2.csv`.
 
@@ -256,6 +263,6 @@ Phần riêng của mã HPG, dùng cùng mục \"Agent theo mã\" (agent B hoặ
 - **Công ty con, dự án:** Khu liên hợp Dung Quất 1 và 2, nhà máy thép ray Dung Quất, mỏ quặng ở Úc, Hòa Phát Nông nghiệp, điện máy gia dụng, khu công nghiệp.
 - **Đầu vào:** quặng sắt (VND `SPOT_IRON_QINGDAO`), than cốc, điện (EVN). **Đầu ra:** xây dựng, bất động sản, đầu tư công (cao tốc, đường sắt tốc độ cao), xuất khẩu; giá HRC (VND `HRC_3MM_EXPORT`), CB240.
 - **Ngành riêng:** sản lượng tiêu thụ hàng tháng; giá thép Trung Quốc và xuất khẩu thép Trung Quốc; thuế chống bán phá giá (HRC Trung Quốc vào Việt Nam; EU, Mỹ với thép Việt Nam); dự án lớn dùng thép (phần của HPG trong F5).
-- **Hàng hóa VND (bước 1):** `get_change_prices` code `SPOT_IRON_QINGDAO,HRC_3MM_EXPORT`, period `1D` và `1M`. `price = 0` kèm `changePct = -100` là chưa cập nhật → ⊘, ghi `lastUpdated`.
+- **Hàng hóa VND (bước 1):** `get_change_prices` code `SPOT_IRON_QINGDAO,HRC_3MM_EXPORT`, period `1D` và `1M`. `price = 0` kèm `changePct = -100` là chưa cập nhật: khi đó tìm "iron ore price" / "HRC steel price" trên tradingeconomics.com (và một bài Reuters/báo thép làm nguồn thứ hai); chỉ một nguồn thì ◐, không có thì ⊘; ghi `lastUpdated` của VND.
 - **So sánh cùng ngành (mã niêm yết):** HSG, NKG, TLH, POM.
 - **Câu tìm mẫu:** "Hòa Phát <tháng năm>", "HPG sản lượng thép tháng", "Dung Quất 2", "chống bán phá giá thép <năm>", "giá thép Trung Quốc tuần".
