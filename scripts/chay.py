@@ -52,29 +52,30 @@ LICH_SU_DU_BAO = ("du-bao-6-phien-dieu-chinh.json", "du-bao-6-phien.json")
 KE_HOACH = [
     ("01 Tải code GitHub", "BA", "git clone (mục 0 SKILL.md) rồi `chay.py <chế độ> bat-dau`"),
     ("02 VND health và công cụ", "BA", "phiên chính: ToolSearch `mcp__VND__`, `mcp__VND__health`; ghi nhật ký"),
-    ("06 Agent T", "BA", "agent Haiku đọc the/T.md, song song với 02–03; ghi nhật ký"),
+    ("06 Agent T", "BA", "agent Haiku: nguyen-tac.md + thu-thap.md (Thẻ T), song song với 02–03; ghi nhật ký"),
     ("03 VND lịch, giá, chỉ số, khối ngoại sàn", "BA", "phiên chính: gọi VND theo mục 'VND MCP' của phien-chinh.md, ghi <W>/gia/vnd.json; ghi nhật ký"),
     ("04–05 Giá", "BA", "`chay.py <chế độ> gia --phien … --cong-cu …` (mã thoát 2 → DỪNG)"),
     ("07 Đồng bộ và liệt kê vault", "A", "skill dong-bo-obsidian; ghi nhật ký"),
-    ("08 Chấm dự báo kỳ trước", "A", "phiên chính (phan-tich-sau.md bước 2); ghi nhật ký"),
-    ("09 Agent B2", "B", "agent Haiku đọc thu-thap.md, trang-web.md, nhan.md, the/B2.md (agent thu thập duy nhất của bản tin); song song cùng 10; ghi nhật ký"),
-    ("10 Agent M", "B", "MỘT agent Haiku cho mọi mã: thu-thap.md, nhan.md, agent-ma.md (mục Chế độ B), the/M-<MÃ>.md của từng mã; ghi nhật ký"),
-    ("11–13 Agent A2, A3, A4", "A", "agent Haiku đọc thu-thap.md, trang-web.md, nhan.md, the/A2..A4.md; song song cùng 14–17 (A4 chỉ bản đầy đủ, bản cập nhật ghi BỎ QUA)"),
-    ("14–17 Agent theo mã", "A", "mỗi mã một agent Haiku đọc thu-thap.md, nhan.md, agent-ma.md, the/M-<MÃ>.md; ghi nhật ký từng agent"),
-    ("18 Agent A5", "BA", "phiên chính gắn nhãn, gom số chưa ✔ vào can_kiem_chung.md; agent Haiku đọc thu-thap.md, trang-web.md, nhan.md, the/A5.md. A: luôn; B: chỉ khi còn số chưa ✔ (không thì BỎ QUA)"),
+    ("08 Chấm dự báo kỳ trước", "A", "script chấm ở bước 25a; phiên chính chỉ chấm nốt dòng kịch bản cũ trong nhat-ky-du-bao.md; ghi nhật ký"),
+    ("09 Agent B", "B", "MỘT agent Haiku: nguyen-tac.md + thu-thap.md (Thẻ B2 rồi Agent theo mã cho mọi mã); ghi nhật ký"),
+    ("11 Agent A-chung", "A", "agent Haiku: nguyen-tac.md + thu-thap.md (Thẻ A2, A3, A4 – A4 chỉ bản đầy đủ); song song với 14"),
+    ("14 Agent A-ma", "A", "MỘT agent Haiku: nguyen-tac.md + thu-thap.md (Agent theo mã, chế độ A, cho mọi mã); ghi nhật ký"),
+    ("18 Agent A5", "BA", "phiên chính gắn nhãn, gom số chưa ✔ vào can_kiem_chung.md; agent Haiku: nguyen-tac.md + thu-thap.md (Thẻ A5). A: luôn; B: chỉ khi còn số chưa ✔ (không thì BỎ QUA)"),
     ("19 Gắn nhãn và ghi nhật ký CSV", "BA", "phiên chính, Python (phien-chinh.md, mục bước 18–19); ghi nhật ký"),
-    ("20–24 Tính toán", "BA", "`chay.py <chế độ> tinh` (A thêm --kich-ban, --nghi nếu có)"),
-    ("25 Agent tổng hợp", "A", "agent Sonnet đọc nguyen-tac.md, nhan.md, tong-hop.md → <W>/bao_cao.md"),
-    ("26 Kiểm tra chéo Opus", "A", "agent Opus đọc kiem-tra-cheo.md"),
+    ("20–25a Tính toán", "BA", "`chay.py <chế độ> tinh` (kể cả du_bao_xs.py; --nghi nếu có)"),
+    ("25 Agent tổng hợp", "A", "agent Sonnet: nguyen-tac.md + tong-hop.md → <W>/bao_cao.md"),
+    ("26 Kiểm tra chéo Opus", "A", "agent Opus: tong-hop.md (mục Kiểm tra chéo cuối cùng)"),
     ("28 Ghép", "BA", "B: viết <W>/ghi_chu_dau.md, <W>/ban_tin.md, <W>/phu_luc_tu_viet.md rồi `chay.py ban-tin ghep`; A: `chay.py sau ghep`"),
-    ("27 Agent O", "A", "agent Sonnet đọc the/O.md (sau khi ghép nhật ký vào báo cáo)"),
-    ("29 Nén và chuẩn bị lưu", "BA", "`chay.py <chế độ> luu` (A: sau agent O; thêm dòng nhật ký dự báo và viết MOC-THEO-DOI.md trước lệnh này)"),
+    ("27 Agent O", "A", "agent Sonnet: tong-hop.md (Thẻ O), sau khi ghép nhật ký vào báo cáo"),
+    ("29 Nén và chuẩn bị lưu", "BA", "`chay.py <chế độ> luu` (A: sau agent O; viết MOC-THEO-DOI.md trước lệnh này)"),
     ("30 Lưu vào dự án", "BA", "phiên chính: project_write từng dòng `luu` in ra; ghi nhật ký (file lỗi ghi đường dẫn)"),
     ("31 Gửi người dùng", "BA", "PushNotification / câu trả lời cuối + SendUserFile ảnh; ghi nhật ký"),
 ]
 
 MAU_PHU_LUC = [
+    "Từng mã – đầy đủ",
     "Kỹ thuật MBB, TCB (bản chữ chart6.py) và giá so với TB20 của các mã khác",
+    "Dự báo xác suất (du_bao_xs.py)",
     "Thế giới đêm qua – đầy đủ",
     "Dòng vốn ngoại – bản chữ ap_luc_von_ngoai.py",
     "Chuỗi truyền dẫn – bản chữ chuoi_truyen_dan.py",
@@ -89,6 +90,8 @@ MAU_PHU_LUC = [
     "Nguồn (kèm cấp 1/2/3)",
     "Nhật ký chạy (nguyên văn research/nhat-ky-chay.txt)",
 ]
+LICH_SU_XS = "du-bao-xs.json"
+KY_HAN_XS = ["5", "20"]
 
 
 # ---------- tiện ích ----------
@@ -306,6 +309,22 @@ def doc_sk(path):
         return []
 
 
+def du_bao_xs(cx, t):
+    """Bước 25a: xác suất tăng 5/20 phiên + vùng 80% cho mọi mã, tự chấm dự báo cũ trong data/du-bao-xs.json."""
+    gia = [f"{m}={os.path.join(cx.GIA, f'gia_{m}_ctck.csv')}" for m in t["ma"]
+           if os.path.isfile(os.path.join(cx.GIA, f"gia_{m}_ctck.csv"))]
+    if not gia:
+        cx.ghi("25a du_bao_xs.py", "loi", "không có file giá gia_<MÃ>_ctck.csv nào")
+        return 1
+    args = [os.path.join(HERE, "du_bao_xs.py"), "--gia"] + gia + ["--ky-han"] + KY_HAN_XS + [
+        "--lich-su", os.path.join(cx.DA, "data", LICH_SU_XS), "--ra", cx.p("du_bao_xs.json")]
+    vni = os.path.join(cx.GIA, "gia_VNINDEX_ctck.csv")
+    if os.path.isfile(vni):
+        args += ["--chi-so", vni]
+    mt, _ = chay_lenh(cx, "25a du_bao_xs.py", args, out=cx.p("du_bao_xs.txt"))
+    return mt
+
+
 def cmd_tinh(cx):
     a, t = cx.a, cx.tt()
     vn = os.path.join(cx.DA, "data", "von-ngoai.csv")
@@ -321,6 +340,10 @@ def cmd_tinh(cx):
         if t["che_do"] == "sau-nhe":
             args.append("--nhe")
         mt, _ = chay_lenh(cx, "24 chay_sau.py", args)
+        mx = du_bao_xs(cx, t)
+        if mx == 0 and os.path.isfile(cx.p("tom_tat_script.md")):
+            with open(cx.p("tom_tat_script.md"), "a", encoding="utf-8") as f:
+                f.write("\n\n## Dự báo xác suất (du_bao_xs.py)\n" + (doc_file(cx.p("du_bao_xs.txt")) or "") + "\n")
         print(f"Xong. Đọc {cx.p('tom_tat_script.md')} (dòng LỖI cũng có trong nhật ký)." if mt == 0 else "chay_sau.py lỗi: xem nhật ký.")
         return mt
 
@@ -373,8 +396,9 @@ def cmd_tinh(cx):
                     f"- {ma} ({r[0]}): đóng cửa {r[1]:g}, TB20 {r[2]:.2f}, {'trên' if r[3] >= 0 else 'dưới'} TB20 {abs(r[3]):.1f}%")
     with open(cx.p("tb20.txt"), "w", encoding="utf-8") as f:
         f.write("\n".join(dong) + "\n")
+    du_bao_xs(cx, t)
     print("Xong. Kết quả: " + ", ".join(
-        [cx.p("ap_luc.txt"), cx.p("chuoi.txt"), cx.p("tb20.txt")] + [cx.p(f"{m}-6-phien.txt") for m in t["bieu_do"]]
+        [cx.p("ap_luc.txt"), cx.p("chuoi.txt"), cx.p("tb20.txt"), cx.p("du_bao_xs.txt")] + [cx.p(f"{m}-6-phien.txt") for m in t["bieu_do"]]
         + [cx.p(f"{m}-6-phien.png") for m in t["bieu_do"]]))
     print(tom_tat(cx.NK).splitlines()[0])
     return 0
@@ -402,16 +426,18 @@ def khop_muc(muc_tu_viet, tieu_de):
 def ghep_phu_luc(cx, t):
     W = cx.p
     tv = doc_muc(W("phu_luc_tu_viet.md"))
+    M = {t.split(" (")[0].split(" –")[0]: t for t in MAU_PHU_LUC}
     tu_dong = {
-        MAU_PHU_LUC[0]: [W(f"{m}-6-phien.txt") for m in t["bieu_do"]] + [W("tb20.txt")],
-        MAU_PHU_LUC[1]: [("tru", W("ket_qua_B2.md"), "Dòng tiền Việt Nam")],
-        MAU_PHU_LUC[2]: [W("ap_luc.txt"), ("muc", W("ket_qua_B2.md"), "Dòng tiền Việt Nam")],
-        MAU_PHU_LUC[3]: [W("chuoi.txt")],
-        MAU_PHU_LUC[5]: [W("ma", f"{m}.md") for m in t["ma"]],
-        MAU_PHU_LUC[6]: [W("tham_chieu_B2.csv")],
-        MAU_PHU_LUC[9]: [W("kiem_chung.md")],
-        MAU_PHU_LUC[11]: sorted(glob.glob(W("danh_muc_*.md"))),
-        MAU_PHU_LUC[12]: sorted(glob.glob(W("nguon_*.md"))),
+        M["Kỹ thuật MBB, TCB"]: [W(f"{m}-6-phien.txt") for m in t["bieu_do"]] + [W("tb20.txt")],
+        M["Dự báo xác suất"]: [W("du_bao_xs.txt")],
+        M["Thế giới đêm qua"]: [("tru", W("ket_qua_B2.md"), "Dòng tiền Việt Nam")],
+        M["Dòng vốn ngoại"]: [W("ap_luc.txt"), ("muc", W("ket_qua_B2.md"), "Dòng tiền Việt Nam")],
+        M["Chuỗi truyền dẫn"]: [W("chuoi.txt")],
+        M["Tin doanh nghiệp không đưa lên thân bản tin"]: [W("ma", f"{m}.md") for m in t["ma"]],
+        M["Doanh nghiệp và ngành tham chiếu"]: [W("tham_chieu_B2.csv")],
+        M["Chưa kiểm chứng"]: [W("kiem_chung.md")],
+        M["Độ đầy đủ dữ liệu"]: sorted(glob.glob(W("danh_muc_*.md"))),
+        M["Nguồn"]: sorted(glob.glob(W("nguon_*.md"))),
     }
     phan = [f"# Phụ lục bản tin {dt.date.fromisoformat(t['ngay']).strftime('%d/%m')}"]
     for td in MAU_PHU_LUC:
@@ -432,6 +458,9 @@ def ghep_phu_luc(cx, t):
                 c = "\n".join("###" + l.lstrip("#") if l.startswith("#") else l for l in c.splitlines())
                 noi.append(c if len(tu_dong[td]) == 1 else f"### {os.path.basename(f)}\n{c}")
         if td == "Độ chính xác dự báo":
+            xs = (doc_json(W("du_bao_xs.json")) or {}).get("lich_su", {}).get("tong")
+            if xs:
+                noi.append("- du_bao_xs.py (mọi mã): " + json.dumps(xs, ensure_ascii=False))
             for m in t["bieu_do"]:
                 d = (doc_json(W(m, "du_bao_6_phien.json")) or {}).get("cham_du_bao_truoc") or {}
                 if d.get("tong_hop"):
@@ -459,7 +488,7 @@ def cmd_ghep(cx):
     thieu_viet = [f for f in (cx.p("ghi_chu_dau.md"), cx.p("ban_tin.md")) if not os.path.isfile(f)]
     if thieu_viet:
         cx.ghi("28 Viết bản tin/báo cáo và phụ lục", "loi", "chưa có " + ", ".join(thieu_viet),
-               "Phiên chính viết ghi_chu_dau.md và ban_tin.md theo mẫu trong ban-tin-sang.md trước khi ghép.")
+               "Phiên chính viết ghi_chu_dau.md và ban_tin.md theo mẫu ở mục Chế độ B của phien-chinh.md trước khi ghép.")
         return 1
     # ghi trước dòng nhật ký của bước 28 để phụ lục chứa cả dòng đó
     thieu = [f for f in (cx.p("ket_qua_B2.md"),) + tuple(cx.p("ma", f"{m}.md") for m in t["ma"])
@@ -570,6 +599,8 @@ def main():
          "ke-hoach": cmd_ke_hoach}[a.lenh]
     try:
         return f(cx)
+    except BrokenPipeError:
+        raise
     except Exception as e:  # lỗi của chính chay.py: ghi nhật ký để biết đây là lỗi code
         import traceback
         tb = traceback.format_exc()
@@ -581,4 +612,11 @@ def main():
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    try:
+        sys.exit(main())
+    except BrokenPipeError:  # đầu ra bị cắt (vd. `| head`): không phải lỗi của skill
+        try:
+            sys.stdout = open(os.devnull, "w")
+        except OSError:
+            pass
+        sys.exit(0)

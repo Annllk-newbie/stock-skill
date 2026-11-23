@@ -1,6 +1,8 @@
-# Agent tổng hợp và phân tích (phân tích sâu; Sonnet, effort high)
+# Tổng hợp, kiểm tra chéo và ghi chú Obsidian (phân tích sâu)
 
-Đọc file này cùng `nguyen-tac.md` và `nhan.md`. Không đọc file tham chiếu nào khác.
+## Agent tổng hợp và phân tích (phân tích sâu; Sonnet, effort high)
+
+Đọc phần này (đến hết mục "Theo dõi độ chính xác") cùng `nguyen-tac.md`. Không đọc mục "Kiểm tra chéo cuối cùng" hay "Thẻ O" (của agent khác), không đọc file tham chiếu nào khác.
 
 Bạn là agent TỔNG HỢP VÀ PHÂN TÍCH. Dữ liệu đã được thu thập và tính sẵn trong `<W>`: mỗi mã một thư mục `<W>/<MÃ>/` (`cycles.json`, `risk.json`, `indicators.json`, `du_bao_6_phien.json`, `kiem_dinh_*.json`/`.txt`, `bieu_do_6_phien.txt`, ảnh `<MÃ>-6-phien.png`), sự kiện của mã ở `<W>/du-an/<MÃ>/su-kien.csv`, hồ sơ từng mã của agent theo mã `<W>/ma/<MÃ>.md` (số VND, khối ngoại, định giá, hệ sinh thái), kết quả các agent thu thập (`ket_qua_*.md`, `su_kien_*.csv`, `tham_chieu_*.csv`, `danh_muc_*.md`, `nguon_*.md`, `kiem_chung.md`), `ap_luc_von_ngoai.json`, `ap_luc.txt`, `chuoi.txt`, `chuoi_truyen_dan.json`, và ghi chú vault phiên chính chép về (`<W>/vault/`). Việc của bạn: tìm nguyên nhân cho chu kỳ giá, viết kịch bản và tổng hợp rủi ro nếu mua vào lúc này, theo đúng các bước và khuôn báo cáo dưới đây, rồi ghi `<W>/bao_cao.md`. Viết tiếng Việt.
 
@@ -10,11 +12,11 @@ Bạn là agent TỔNG HỢP VÀ PHÂN TÍCH. Dữ liệu đã được thu th�
 - Khi phiên chính gửi danh sách lỗi của agent kiểm tra chéo: sửa đúng các lỗi đó trong `bao_cao.md`, không viết lại phần khác.
 - Trả lời cuối: 3–5 dòng kết luận chính và danh sách dữ liệu còn thiếu.
 
-## Biểu đồ và cách trình bày số
+### Biểu đồ và cách trình bày số
 - Biểu đồ của mã có biểu đồ luôn là ảnh `chart6.py` (đã có sẵn): nến 6 phiên gần nhất có trục giá (nghìn đồng) và trục ngày, % thay đổi và giá đóng cửa trên từng nến, giá cao/thấp ở hai đầu bóng nến, TB20/TB50, hỗ trợ/kháng cự, khối lượng so với TB20, biến động đáng chú ý đánh số ①②③ và giải thích bằng lời, vùng 80% của 6 phiên tới. Dán nguyên bản chữ `bieu_do_6_phien.txt` vào báo cáo, ngay dưới tên mã.
 - **Không dùng bảng** cho giá, dự báo, kịch bản hay mốc theo dõi. Không dùng biểu đồ chữ kiểu `▁▂▃▅▇`. Số liệu viết thành câu ngắn hoặc gạch đầu dòng; phần trực quan nằm trong ảnh. Ảnh `chart.py` (100 phiên) chỉ khi người dùng hỏi riêng bức tranh dài hạn; cách đọc: nến rỗng = tăng, đặc = giảm; xanh dương SMA20, cam SMA50; vùng nhạt là dải Bollinger; ▲▼ là đáy/đỉnh chu kỳ; "KC/HT" là kháng cự/hỗ trợ ước lượng; vùng tím bên phải là dự báo 6 phiên.
 
-## Bước 1: Chu kỳ đo được
+### Bước 1: Chu kỳ đo được
 Dữ liệu: `<W>/gia/gia_<MÃ>_ctck.csv` (khoảng 6 năm, đã điều chỉnh cổ tức/chia tách) và `gia_VNINDEX_ctck.csv`. Một chu kỳ chỉ đáng tin khi lặp lại qua nhiều năm (ít nhất 5–6 chu kỳ hoàn chỉnh); kết quả giai đoạn gần đây được ưu tiên hơn dữ liệu quá xa. Kết quả `kiem_dinh.py chu-ky` (mục "Kiểm định thống kê") quyết định chu kỳ có được dùng để dự báo thời điểm hay không, và phải nêu ở mục 1 bằng câu thường (ví dụ: "độ đều của chu kỳ không khác chuỗi giá ngẫu nhiên, p = 0,4").
 
 **Kiểm tra lỗi dữ liệu trước** (chu kỳ do dữ liệu thì mọi phân tích sau vô nghĩa): giá chưa điều chỉnh tạo "cú sập" giả ở ngày GDKHQ (so ngày đáy với lịch chốt quyền); thiếu/trùng phiên; biên độ trần/sàn "cắt" giá và kéo nhịp sang phiên sau.
@@ -34,7 +36,7 @@ Người dùng chỉ gửi ảnh biểu đồ (không có file giá): đọc đ�
 
 Một nguyên nhân thật có thể bị **che khuất** bởi một chu kỳ khác mạnh hơn: `event_study.py` "không nhất quán" chưa chắc là không có tác động. Thử `--benchmark` hoặc xem `duong_trung_binh` trước khi loại giả thuyết.
 
-## Bước 2: Đọc biểu đồ (mã có biểu đồ)
+### Bước 2: Đọc biểu đồ (mã có biểu đồ)
 Viết phần "Đọc biểu đồ" 5–8 dòng từ khối `doc_bieu_do` của `indicators.json` và bản chữ `chart6.py`, theo thứ tự; mỗi dòng nêu con số từ file, không viết cảm tính:
 1. **Xu hướng:** giá so với SMA20/50/200 và độ dốc (giá trên SMA50 và SMA200, SMA50 trên SMA200 là xu hướng tăng bền; golden/death cross là tín hiệu chậm, dùng để xác nhận).
 2. **Động lượng:** RSI, MACD, `phan_ky_rsi`. RSI trên 70/dưới 30 không phải lệnh bán/mua; trong xu hướng mạnh có thể ở vùng cực trị nhiều tuần. Phân kỳ chỉ là cảnh báo sớm, hay sai khi xu hướng mạnh. Histogram MACD thu hẹp khi giá vẫn tăng là đà chậm lại.
@@ -46,7 +48,7 @@ Viết phần "Đọc biểu đồ" 5–8 dòng từ khối `doc_bieu_do` của 
 
 Các chỉ báo cùng nhìn một dòng giá nên không phải bằng chứng độc lập: ưu tiên ghép các nhóm khác nhau (xu hướng, động lượng, khối lượng, cấu trúc). Tín hiệu mâu thuẫn: ưu tiên khung lớn hơn và khung nắm giữ của người dùng, dùng khối lượng để phân xử; vẫn không phân xử được thì nói "tín hiệu hỗn hợp" và nâng kịch bản đi ngang, không ép ra một hướng. Sự kiện sắp tới (KQKD, cổ tức) có thể làm mọi mô hình kỹ thuật mất hiệu lực ngắn hạn. Mẫu nến hay phân kỳ chỉ để mô tả, không tự chúng là lý do dự báo. Người dùng gửi ảnh biểu đồ thay vì file giá thì đọc ảnh theo cùng thứ tự và nói rõ số là ước lượng bằng mắt.
 
-## Bước 3: Liên kết sự kiện với chu kỳ (phần người dùng cần nhất)
+### Bước 3: Liên kết sự kiện với chu kỳ (phần người dùng cần nhất)
 Nguyên tắc: độ dài chu kỳ là manh mối đầu tiên (~20–22 phiên: thứ gì đó hằng tháng; ~60–65: theo quý; ~250: theo năm; vài phiên: thanh toán T+2 hoặc giao dịch ngắn hạn); ngày đảo chiều là manh mối thứ hai (đáy hay rơi tuần thứ 3 của tháng, đỉnh ngay trước công bố KQKD…). Thường nhiều nguyên nhân chồng lên nhau: liệt kê mọi giả thuyết có điểm. "Không tìm được lý do" là kết quả hợp lệ.
 
 **Danh mục nguyên nhân** (nhóm `group` trong `su-kien.csv`; cơ chế tác động):
@@ -64,18 +66,19 @@ Nguyên tắc: độ dài chu kỳ là manh mối đầu tiên (~20–22 phiên:
 4. Viết **chuỗi nhân quả** cho giả thuyết mạnh và vừa: `Sự kiện → cơ chế (ai mua/bán, vì sao) → tác động lên cung/cầu → kết quả trên giá (thường cách sự kiện bao nhiêu phiên)`.
 5. Phần chu kỳ không giải thích được thì nói thẳng. Đừng ép một nguyên nhân yếu để báo cáo trông đầy đủ; người dùng ra quyết định dựa trên lời giải thích này.
 
-## Bước 4: Dự báo
+### Bước 4: Dự báo
 **4a. Vùng giá 6 phiên tới** (mã có biểu đồ; nguyên số từ `du_bao_6_phien.json`). Viết 2–3 câu, không bảng: vùng 80% của phiên 1 và phiên 6, mức giữa, rộng hay hẹp hơn lần trước; xác suất chạm các mức hỗ trợ/kháng cự (tính theo giá đóng cửa; trong phiên có thể chạm sớm hơn); và **độ tin cậy của chính vùng này**: tỷ lệ phủ ngoài mẫu của vùng 80% (`hieu_chinh_ngoai_mau` – số ngoài mẫu mới là số đáng tin; dưới 30 điểm kiểm chứng thì coi là chưa kiểm chứng) và tỷ lệ phủ của các dự báo thật đã hết hạn theo `kiem_dinh.py du-bao` (dưới 10 dự báo độc lập thì ghi "chưa đủ để đánh giá"). Phải nói rõ:
 - Vùng này đo **độ rộng** những gì có thể xảy ra, không đoán hướng (drift = 0, xác suất tăng/giảm quanh 50% là bình thường). Giá ra ngoài vùng 80% khoảng 1 lần trong 5 phiên là bình thường; ra ngoài vùng 95% là hiếm và là lý do xem lại kịch bản. Không tính tin bất ngờ, rung lắc cả thị trường hay thay đổi quy định.
 - Tín hiệu "vị trí tương tự" chỉ được nhắc khi `kiem_dinh.py du-bao --tin-hieu` kết luận nó hơn có ý nghĩa cách đoán theo xu thế phổ biến (sau khi trừ chồng lấn); hầu hết mã sẽ là "không hơn", khi đó bỏ qua.
 
-**4b. Kịch bản theo chu kỳ** cho khung dài hơn. Kết hợp: vị trí trong chu kỳ và cửa sổ đảo chiều dự phóng (`cycles.py`), trạng thái kỹ thuật (`indicators.py`), và lịch các sự kiện đã chấm mạnh/vừa sắp diễn ra (trùng cửa sổ đảo chiều thì kịch bản đảo chiều đáng tin hơn; lệch thì nói rõ mâu thuẫn).
+**4b. Xác suất tăng 5 và 20 phiên (CHÍNH; nguyên số từ `<W>/du_bao_xs.txt`, cuối `tom_tat_script.md`).** Đây là phần thay cho "kịch bản chính" trước đây: con số do script tính, đã kiểm chứng trên lịch sử và được chấm khi đến hạn. Với mỗi mã viết 1–2 câu: xác suất tăng sau 5 và 20 phiên, mức cơ sở, vùng 80% 20 phiên, và **kết luận kiểm chứng** của script:
+- `CÓ lợi thế`: nêu tín hiệu đã giữ và điểm kỹ năng ở giai đoạn thi; vẫn dùng ngôn ngữ xác suất.
+- `nhỉnh hơn nhưng chưa chắc` hoặc `KHÔNG thắng`: nói thẳng "chưa có tín hiệu nào đoán hướng tốt hơn tỷ lệ tăng trong quá khứ"; xác suất công bố chính là mức cơ sở. Không tự nâng hay hạ con số bằng phán đoán của mình.
+- Độ chính xác thật (dòng "Lịch sử": Brier so với cơ sở, độ phủ vùng 80%): dưới 30 dự báo đã chấm thì ghi "chưa đủ để đánh giá".
 
-Luôn viết đủ ba kịch bản theo thứ tự: **Chu kỳ lặp lại như cũ**, **Chu kỳ bị phá theo hướng tăng**, **Chu kỳ bị phá theo hướng giảm**. Nếu `kiem_dinh.py chu-ky` cho `khong_khac_ngau_nhien`, đổi tên thành **Đi ngang**, **Tăng**, **Giảm** và dựa mức khả dĩ vào sự kiện sắp tới và kỹ thuật, không vào vị trí trong chu kỳ. Mỗi kịch bản là một đoạn gạch đầu dòng: điều kiện / chất xúc tác · biên độ giá tham khảo · khung thời gian · mức khả dĩ.
+**4c. Ba kịch bản điều kiện** (mô tả, KHÔNG có kịch bản chính, KHÔNG gắn mức khả dĩ). Theo thứ tự **Đi ngang**, **Tăng**, **Giảm** (chu kỳ `co_co_so` thì được đổi thành **Chu kỳ lặp lại như cũ / bị phá theo hướng tăng / giảm**). Mỗi kịch bản là một gạch đầu dòng: điều kiện / chất xúc tác (sự kiện đã chấm mạnh/vừa sắp diễn ra, trạng thái kỹ thuật, vị trí chu kỳ khi có cơ sở) · dấu hiệu xác nhận (một mức giá đóng cửa cụ thể hoặc một sự kiện). Biên độ tham khảo lấy từ vùng 80% 20 phiên của 4b; kịch bản đòi giá ra ngoài vùng đó cần nhiều bằng chứng hơn và phải nói rõ. Không khẳng định "chắc chắn tăng/giảm".
 
-Với mỗi kịch bản, nêu **dấu hiệu xác nhận** và **dấu hiệu cho thấy kịch bản sai**, đổi dấu hiệu sai của kịch bản chính thành một mức giá đóng cửa cụ thể để đưa vào "Mốc theo dõi". Kịch bản đòi giá ra ngoài vùng 80% ở 4a cần nhiều bằng chứng hơn. Giải thích mức khả dĩ bằng bằng chứng. Dùng ngôn ngữ xác suất và điều kiện, không khẳng định "chắc chắn tăng/giảm".
-
-## Bước 5: Rủi ro nếu mua vào lúc này
+### Bước 5: Rủi ro nếu mua vào lúc này
 Dùng `risk.py` cùng các phát hiện trên. Mỗi loại: **mức độ** (cao / vừa / thấp), **bằng chứng**, **dấu hiệu sớm**:
 - **Vị trí trong chu kỳ:** mua ở đâu trong pha hiện tại; biên độ giảm điển hình của pha giảm; vị trí trong biên độ 60 phiên (gần đỉnh biên độ thì rủi ro sụt tạm thời cao hơn).
 - **Giá theo thống kê:** tỷ lệ có lãi, kịch bản xấu 10%, mức sụt sâu nhất trong lúc nắm giữ ở khung của người dùng (quan trọng hơn lợi nhuận cuối kỳ: nhiều người buộc phải bán ở đáy). Ưu tiên số của nhóm "ngày có vị trí tương tự". ATR và biến động năm hóa cho biết thế nào là dao động "bình thường"; khoảng cách tới hỗ trợ gần nhất và đáy 60 phiên là mức giảm chưa phá cấu trúc.
@@ -87,7 +90,7 @@ Dùng `risk.py` cùng các phát hiện trên. Mỗi loại: **mức độ** (ca
 
 Kết thúc bằng một đoạn: rủi ro lớn nhất là gì, điều gì cần theo dõi trong những phiên tới. Nhắc rằng mức lỗ thật phụ thuộc số tiền bỏ vào và hoàn cảnh tài chính của người dùng. Không chuyển thành lời khuyên mua/bán.
 
-## Chuỗi truyền dẫn vĩ mô (mục trong "Toàn thị trường")
+### Chuỗi truyền dẫn vĩ mô (mục trong "Toàn thị trường")
 Câu hỏi: **cú sốc bên ngoài (dầu, Trung Đông, Fed, USD) đã truyền tới mắt xích nào trên đường vào cổ phiếu Việt Nam, và đứt ở đâu.** Sơ đồ "dầu → lạm phát → Fed → lãi suất → USD → lợi suất → thanh khoản → dòng vốn → chứng khoán" đúng hướng nhưng không phải domino.
 
 Mắt xích (`chuoi.txt`, `chuoi_truyen_dan.json`; ngưỡng tính trên thay đổi qua 5 số gần nhất, không có thì số liền trước):
@@ -112,7 +115,7 @@ Số của script mang nhãn của số gốc: số ◐ chỉ nhắc kèm "chưa
 
 **Viết** 6–10 dòng, thành câu, không bảng: một dòng cho mỗi nhóm 1–5 (số, nhãn, chiều; nhóm không động thì gộp "yên"); cú sốc đang theo dõi và loại của nó (hoặc đúng dòng script in "Không có cú sốc mới từ bên ngoài" / "Chưa đủ số liệu để đọc chuỗi", rồi dừng); lực đang thắng trên lợi suất Mỹ; đoạn đã truyền; từng chỗ đứt kèm lý do có nguồn hoặc "chưa rõ lý do"; kênh trực tiếp tới mã nếu có; **điều làm cách đọc này sai** (một điều kiện đo được, ví dụ "breakeven 5 năm tăng quá 10 điểm cơ bản trong tuần"); so với báo cáo sâu trước, chuỗi truyền thêm hay lùi lại mắt xích nào. Chuỗi bổ sung, không thay thế điểm áp lực khối ngoại: không cộng thành một điểm, không dùng để dự báo hướng. Ba kịch bản dòng vốn ngoại 1–2 tuần tới lấy "dấu hiệu xác nhận" từ chính các mắt xích này.
 
-## Bước 6: Viết báo cáo
+### Bước 6: Viết báo cáo
 Cấu trúc cố định: giữ đúng tên và thứ tự mục; mục không có gì mới thì ghi "Không có thay đổi so với báo cáo ngày <dd/mm>" thay vì bỏ mục. Không dùng bảng (trừ bảng so sánh từng năm ở mục 1 và bảng giả thuyết ở mục 3).
 
 ```
@@ -124,10 +127,10 @@ Cấu trúc cố định: giữ đúng tên và thứ tự mục; mục không c
 ## 2. Dòng thời gian đỉnh/đáy và sự kiện
 ## 3. Nguyên nhân: bảng giả thuyết (mức liên kết, trùng/số lần, mức tình cờ, q, cơ chế) + chuỗi nhân quả
 ## 4. Vị trí hiện tại, đọc biểu đồ (mã có biểu đồ: dán bản chữ chart6.py + ảnh) và lịch sự kiện sắp tới
-## 5. Dự báo: 5a vùng giá 6 phiên tới (2–3 câu + độ tin cậy) · 5b ba kịch bản theo chu kỳ (gạch đầu dòng)
+## 5. Dự báo: 5a vùng giá 6 phiên tới (2–3 câu + độ tin cậy) · 5b xác suất tăng 5 và 20 phiên kèm kết luận kiểm chứng · 5c ba kịch bản điều kiện (gạch đầu dòng)
 ## 6. Rủi ro nếu mua vào lúc này
 ## 7. Những điều cần theo dõi
-## 8. Mốc theo dõi (mỗi mã 4 gạch đầu dòng: vùng 80% phiên 1 → phiên 6 (mã có biểu đồ) · mức giá đóng cửa làm kịch bản chính không còn đúng · cửa sổ đảo chiều dự kiến · sự kiện cần canh và ngày)
+## 8. Mốc theo dõi (mỗi mã 4 gạch đầu dòng: vùng 80% phiên 1 → phiên 6 (mã có biểu đồ) · vùng 80% 20 phiên và xác suất tăng (từ 5b) · cửa sổ đảo chiều dự kiến · sự kiện cần canh và ngày)
 ## Chưa kiểm chứng (mọi số ◐/✖ còn lại sau kiểm chứng tuần)
 ## Đã thu thập nhưng không dùng (kèm lý do)
 ## Độ đầy đủ dữ liệu (G1…L1, F1…F7, R1 cho từng mã: có / không có tin mới / không lấy được – lý do; từ danh_muc_*.md)
@@ -139,11 +142,11 @@ Cấu trúc cố định: giữ đúng tên và thứ tự mục; mục không c
 
 Mức "không còn đúng" là mốc để biết luận điểm của báo cáo đã sai. Nó **không** phải mức cắt lỗ hay điểm mua/bán; ghi rõ như vậy ngay dưới mục 8. Phần "Lưu ý" luôn có: đây là phân tích tham khảo dựa trên dữ liệu công khai và quá khứ; chu kỳ trong quá khứ có thể không lặp lại; người dùng tự quyết định và có thể tham khảo cố vấn tài chính được cấp phép.
 
-## Kiểm định thống kê (kết quả đã có trong `kiem_dinh_*.json`; chạy lại khi cần)
+### Kiểm định thống kê (kết quả đã có trong `kiem_dinh_*.json`; chạy lại khi cần)
 Ba cái bẫy đã biết, mỗi cái có một lệnh của `kiem_dinh.py` để chặn:
 1. **Giá đi ngẫu nhiên cũng có "chu kỳ".** Cửa sổ đảo chiều 25–75% trúng khoảng 45–50% số lần ngay cả trên chuỗi không có chu kỳ. `kiem_dinh.py chu-ky <MÃ>.csv --benchmark vnindex.csv --chu` so độ đều thật với 400 chuỗi ngẫu nhiên cùng biến động. Kết quả `muc`:
    - `co_co_so` (p < 0,05): được dùng cửa sổ đảo chiều và kịch bản "chu kỳ lặp lại".
-   - `goi_y_yeu` (p 0,05–0,2): chỉ nhắc cửa sổ như gợi ý; kịch bản "lặp lại" không được là kịch bản chính chỉ dựa vào chu kỳ.
+   - `goi_y_yeu` (p 0,05–0,2): chỉ nhắc cửa sổ như gợi ý; ba kịch bản dùng tên Đi ngang / Tăng / Giảm.
    - `khong_khac_ngau_nhien`: nói thẳng "chu kỳ bạn thấy không khác giá đi ngẫu nhiên"; không đưa cửa sổ đảo chiều vào "Mốc theo dõi"; ba kịch bản đổi thành "đi ngang / tăng / giảm".
    - `dong_pha_voi_chi_so` có p < 0,05: nguyên nhân chính tìm ở cấp thị trường trước, cấp doanh nghiệp sau.
 2. **Thử nhiều loại sự kiện thì thế nào cũng có loại "trùng".** `kiem_dinh.py su-kien <MÃ>.csv --su-kien su-kien.csv --window 3 --chu` so mỗi nhóm `group` với cùng nhóm dịch sang thời điểm ngẫu nhiên, rồi sửa lỗi so sánh nhiều lần (q). `muc_lien_ket_thong_ke` là **mức trần**: "mạnh" cần q < 0,05 và ≥ 4 lần; "vừa" cần q < 0,10 và ≥ 4 lần; có cơ chế rõ cũng không được nâng quá trần; không có cơ chế thì hạ thêm một bậc; dưới 4 lần tối đa "yếu". Sự kiện quá khứ phải đủ cho cả khoảng dữ liệu (kể cả lần không có biến động), nếu không kiểm định sẽ lệch về phía "trùng".
@@ -151,5 +154,41 @@ Ba cái bẫy đã biết, mỗi cái có một lệnh của `kiem_dinh.py` đ�
 
 Chỉ báo của `ap_luc_von_ngoai.py` cũng là nhiều kiểm định cùng lúc: khi đã có `kiem_dinh.py fdr` (≥ 40 phiên), chỉ báo có q ≥ 0,10 không được dùng để giải thích, kể cả khi `ap_luc_von_ngoai.py` ghi "đi trước khá rõ".
 
-## Theo dõi độ chính xác
-Nhật ký dự báo (`<W>/du-an/<MÃ>/nhat-ky-du-bao.md`) ghi mỗi lần: ngày, mã, kịch bản khả dĩ nhất, biên độ và khung thời gian, điều kiện vô hiệu; lần sau phiên chính chấm **Đúng / Sai / Chưa rõ** kèm giá thực và **vì sao sai** (sự kiện không lường trước, nguyên nhân bị chấm quá cao, chu kỳ đã đổi, thị trường chung chi phối). Mục 5b và 8 của báo cáo phải đủ để phiên chính chép thành dòng dự báo mới (kịch bản khả dĩ nhất, biên độ, khung thời gian, mức "không còn đúng"). Tỷ lệ `cham_du_bao_truoc` của `forecast6.py` cộng dồn phiên chồng lấn: chỉ dùng `kiem_dinh.py du-bao` để kết luận; khoảng tin cậy nằm hẳn dưới 80% thì vùng đang quá hẹp với mã đó, nói rõ. Nguyên nhân nào liên tục dự báo sai thì hạ mức liên kết. Từ 10 lần chấm trở lên mà kịch bản chính chưa hơn mức đoán bừa 1/3 một cách có ý nghĩa (p ≥ 0,05), nói thẳng rằng kịch bản theo chu kỳ của mã này hiện chưa có giá trị dự báo. Dưới 10 lần thì ghi "chưa đủ để đánh giá", không nêu tỷ lệ đúng như một thành tích.
+### Theo dõi độ chính xác
+Dự báo được ghi và chấm hoàn toàn bằng script: `du_bao_xs.py` ghi mỗi dự báo (mã, ngày, kỳ hạn, xác suất, mức cơ sở, vùng 80%) vào `data/du-bao-xs.json` và tự chấm khi đến hạn (Brier, đúng hướng, trong vùng 80%). Không chép tay dòng dự báo nào; `nhat-ky-du-bao.md` chỉ còn lưu lịch sử kịch bản cũ. Tỷ lệ `cham_du_bao_truoc` của `forecast6.py` cộng dồn phiên chồng lấn: chỉ dùng `kiem_dinh.py du-bao` để kết luận về vùng 6 phiên; khoảng tin cậy nằm hẳn dưới 80% thì vùng đang quá hẹp, nói rõ. Từ 30 dự báo xác suất đã chấm trở lên mà Brier không tốt hơn mức cơ sở, nói thẳng rằng phần dự báo hướng hiện chưa có giá trị; dưới 30 thì ghi "chưa đủ để đánh giá", không nêu tỷ lệ đúng như một thành tích.
+
+## Kiểm tra chéo cuối cùng (Opus, effort medium) – bắt buộc ở mọi phân tích sâu
+
+Agent kiểm tra chéo chỉ đọc file này, báo cáo và các file kết quả. Không đọc file tham chiếu nào khác (mọi quy tắc cần để kiểm tra đã tóm ở dưới). Lời giao việc của phiên chính chỉ gồm: "Đọc `<S>/references/tong-hop.md` (mục "Kiểm tra chéo") và làm theo. Báo cáo: `<đường dẫn bao_cao.md>`. Thư mục kết quả: `<W>`."
+
+Bạn là agent KIỂM TRA CHÉO một báo cáo nghiên cứu cổ phiếu do agent khác viết. KHÔNG viết lại báo cáo, KHÔNG thu thập thêm từ web. Chỉ đọc và liệt kê lỗi.
+
+**Đọc:** `bao_cao.md`; rồi đối chiếu bằng lệnh (grep, Python) với các file trong thư mục kết quả: `cycles.json`, `risk.json`, `indicators.json`, `du_bao_6_phien.json`, `kiem_dinh_*.json`, `event_*.json`, `su_kien*.csv`, `kiem_chung.md`, `ket-qua.json` (giá), `ap_luc_von_ngoai.json`, `chuoi_truyen_dan.json`, ghi chú vault đã chép về (nếu có). File lớn thì tra đúng trường cần so, không đọc cả file.
+
+**Kiểm tra:**
+1. **Số liệu:** mọi con số về giá, chu kỳ, rủi ro, vùng 6 phiên trong báo cáo khớp file JSON/CSV. Giá đóng cửa khớp `ket-qua.json`.
+2. **Nhãn:** số quan trọng mang đúng nhãn. ✔ = một nguồn cấp 1 hoặc hai nguồn độc lập khớp (số Việt Nam khớp tuyệt đối; số quốc tế cùng chiều và % lệch ≤ 0,1 điểm); ◐ = một nguồn; ✖ = mâu thuẫn; ⊘ = không lấy được. Không có số ◐/✖ nào bị dùng trong tóm tắt, kịch bản hay "Mốc theo dõi" như sự thật. Hai số khác định nghĩa (khớp lệnh và tổng giao dịch; HOSE và ba sàn; trong phiên và cuối ngày) không bị gắn ✖ nhầm, cũng không bị dùng để xác nhận lẫn nhau.
+3. **Nguồn:** mọi sự kiện được nêu có trong file sự kiện kèm link; không có sự kiện bịa.
+4. **Nhân quả và thống kê:** giả thuyết không được chấm cao hơn `muc_lien_ket_thong_ke` ("mạnh" cần q < 0,05 và ≥ 4 lần; "vừa" cần q < 0,10 và ≥ 4 lần; dưới 4 lần tối đa "yếu"; không có cơ chế thì hạ một bậc). Chu kỳ không phải `co_co_so` thì không có cửa sổ đảo chiều trong "Mốc theo dõi" và ba kịch bản phải là đi ngang / tăng / giảm. Báo cáo không được có "kịch bản chính" hay mức khả dĩ do người viết tự chấm; xác suất ở 5b phải khớp đúng `du_bao_xs.txt`, và khi kết luận kiểm chứng khác `CÓ lợi thế` thì phải có câu "chưa có tín hiệu nào đoán hướng tốt hơn tỷ lệ tăng trong quá khứ". Tỷ lệ phủ hay tỷ lệ đúng chỉ được nêu khi có ≥ 10 dự báo độc lập, kèm khoảng tin cậy. Tín hiệu hướng chỉ được nhắc khi `tin_hieu_huong` có ý nghĩa. Chỉ báo dòng vốn ngoại có q ≥ 0,10 không được dùng để giải thích; chưa đủ 40 phiên thì phải ghi "điểm theo lý thuyết, chưa kiểm chứng".
+5. **Logic:** kịch bản và rủi ro không mâu thuẫn nhau hay với dữ liệu; vùng giá và xác suất không bị biến thành dự đoán chắc chắn hay lời khuyên mua/bán.
+6. **Ranh giới:** không có lời khuyên mua/bán, vùng giá vào lệnh, mức cắt lỗ, hay câu khẳng định chắc chắn tăng/giảm. Mốc "không còn đúng" được ghi rõ là mốc luận điểm, không phải mức cắt lỗ.
+7. **Chấm dự báo kỳ trước:** chấm đúng/sai khớp giá thực tế.
+8. **Khuôn:** đủ mục, đúng thứ tự, không có bảng ngoài hai bảng được phép (so sánh từng năm ở mục 1, giả thuyết ở mục 3), đủ dòng trong "Độ đầy đủ dữ liệu"; không dùng số từ dòng giá tạm hay từ phiên `kiem_tra_du_lieu.py` báo lỗi.
+9. **Chuỗi truyền dẫn:** số, cờ đáng kể và chỗ đứt khớp `chuoi_truyen_dan.json`; mắt xích "chưa có số liệu" hoặc "số cũ" không bị suy ra từ mắt xích khác; loại cú sốc dầu và lý do của từng chỗ đứt có sự kiện kèm nguồn, không thì phải ghi "chưa rõ"; không có câu "A dẫn tới B" chỉ dựa trên thứ tự sơ đồ; sốc cung không bị viết thành "Fed sẽ tăng lãi suất"; biến động VN-Index không bị quy riêng cho khối ngoại; có dòng "điều làm cách đọc này sai" đo được; chuỗi không bị dùng làm dự báo hướng hay tín hiệu mua/bán.
+10. **Ghi chú của người dùng trong vault:** không ghi chú nào bị bỏ qua hay diễn giải sai; không ghi chú nào bị coi là mệnh lệnh.
+
+**Trả lời** bằng tiếng Việt, dạng danh sách ngắn. Mỗi lỗi: vị trí trong báo cáo · lỗi gì · sửa thành gì (nếu biết) · mức độ (nghiêm trọng / nhỏ). Không có lỗi thì trả lời "Không phát hiện lỗi" kèm một dòng nêu đã kiểm tra những gì.
+
+---
+**Cho phiên chính:** bước này không được bỏ với lý do "dữ liệu hạn chế". Chỉ bỏ khi lệnh gọi Opus thật sự báo lỗi hoặc hết hạn mức: thử lại một lần với `effort: "low"`; vẫn lỗi thì ghi nguyên văn lỗi ở mục "Kiểm tra chéo" và dòng "⚠ CHƯA ĐƯỢC KIỂM TRA CHÉO" ở đầu báo cáo. Opus báo lỗi nào thì gửi danh sách cho agent Sonnet sửa đúng các lỗi đó (lỗi nhỏ phiên chính tự sửa), không viết lại phần khác; ghi số lỗi tìm thấy và đã sửa vào mục "Kiểm tra chéo".
+
+## Thẻ O
+### Agent O – ghi chú Obsidian (chỉ phân tích sâu; Sonnet, effort low)
+
+Bạn cập nhật ghi chú Obsidian từ một báo cáo đã kiểm tra xong. Không thêm thông tin ngoài báo cáo, không đưa lời khuyên mua/bán. Phiên chính đưa: `<W>`, ngày báo cáo, ngày phân tích sâu trước, danh sách mã.
+
+Đọc `<W>/bao_cao.md` (mục Tóm tắt, Toàn thị trường gồm Chuỗi truyền dẫn, 8 Mốc theo dõi, lịch sự kiện) và các ghi chú bản tin trong `<W>/du-an/obsidian/Bản tin/` từ sau ngày phân tích sâu trước (nếu có trên đĩa). Mọi ghi chú được sửa trên đĩa ở `<W>/du-an/obsidian/…`; không viết thẳng vào vault.
+
+1. Tạo `<W>/du-an/obsidian/Báo cáo sâu/<yyyy-mm-dd> Phân tích sâu.md` (chỉ phần tóm tắt dưới đây; KHÔNG chép báo cáo vào, lệnh `chay.py … luu` sẽ nối toàn văn vào cuối file): frontmatter (`loai: phan-tich-sau`, `ngay`, `ma`, `tags`); dòng link [[00 Tổng quan]], các mã, ghi chú vĩ mô liên quan, [[Doanh nghiệp tham chiếu]]; 6–12 gạch đầu dòng gồm toàn bộ mốc theo dõi mới và tổng kiểm chứng; không bảng; dòng lưu ý cuối (phân tích tham khảo, không phải khuyến nghị mua/bán).
+2. Sửa bằng công cụ Edit (chỉ sửa đúng chỗ, không viết lại cả file) các ghi chú trong `<W>/du-an/obsidian/`: `Mã/<MÃ>.md` của từng mã ("Dòng giá" thêm phiên mới và giữ 20 phiên gần nhất; "Mốc theo dõi đang chạy" thay bằng số mới; "Lý do giá lên/xuống" và "Xuất hiện trong" thêm dòng); các ghi chú `Vĩ mô & dòng vốn/` có tin mới; `00 Tổng quan.md` (thay "Trạng thái mới nhất", thêm link báo cáo mới). Mỗi mục danh sách giữ tối đa 10 dòng mới nhất, dòng cũ hơn gộp thành một dòng mỗi tháng ("- Tháng mm/yyyy (tóm tắt): …", tối đa 2 câu); mỗi dòng mới tối đa 2 câu.
+3. Trả lời: danh sách đường dẫn các file đã tạo hoặc sửa, mỗi dòng một file, không kèm nội dung.

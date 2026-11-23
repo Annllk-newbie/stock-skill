@@ -101,7 +101,7 @@ def nen_file(goc, rel, so_ngay, hom_nay):
     ghi_luu = []
     if cu:
         # MỘT file lưu trữ cho mỗi nhật ký (không chia theo quý). File này phải được agent T tải về trước
-        # (nếu đã có trong dự án) để dòng cũ không bị ghi đè; xem danh sách tải trong ban-tin-sang.md.
+        # (nếu đã có trong dự án) để dòng cũ không bị ghi đè; xem danh sách tải ở Thẻ T của thu-thap.md.
         ten = os.path.basename(rel).rsplit(".", 1)[0]
         luu_rel = "luu-tru/" + ten + ".csv"
         luu = os.path.join(goc, luu_rel)
