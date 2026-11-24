@@ -22,12 +22,17 @@ Mọi việc thu thập và tải dữ liệu dùng Haiku; Sonnet chỉ tổng h
 - Chỉ phân tích sâu: tổng hợp (Sonnet, effort high), kiểm tra chéo (Opus, effort medium, **bắt buộc**), agent O (Sonnet, effort low).
 
 **Số agent mỗi lần chạy (cố định, không tự thêm):**
-- Bản tin sáng: **2** = T · B (một agent thu thập làm cả tin chung lẫn từng mã); thêm A5 chỉ khi còn số quan trọng chưa ✔ (tối đa 3).
+- Bản tin sáng: **2** = T · B (một agent thu thập làm cả tin chung lẫn từng mã); thêm A5 khi còn số quan trọng chưa ✔ **hoặc có mục ⊘** (tối đa 3; xem bước 6 của "Chế độ B").
 - Phân tích sâu (cả hai mức): **7** = T · A-chung (lịch, vĩ mô, quốc tế, tin nền tảng) · A-ma (mọi mã) · A5 · tổng hợp · kiểm tra chéo · O. Sửa lỗi sau kiểm tra chéo gửi lại cho chính agent tổng hợp (SendMessage), không tạo agent mới.
 Thêm mã vào danh sách theo dõi không thêm agent: A-ma và B làm lần lượt mọi mã. Cuối báo cáo ghi một dòng: mô hình nào đã thu thập, tổng hợp, kiểm tra.
 
 ### Giao việc (lời giao việc mẫu; không chép quy tắc vào)
-Mọi lời giao việc gồm: tên agent · câu "Đọc `<S>/references/nguyen-tac.md` và `<S>/references/thu-thap.md` rồi làm đúng các thẻ ghi dưới đây" · tham số chung: phiên cần lấy, ngày lần chạy trước, danh sách mã, `<W>`, đường dẫn `<W>/du-an/data/TOM-TAT.md`.
+Mọi lời giao việc gồm: tên agent · câu "Đọc `<S>/references/nguyen-tac.md` và `<S>/references/thu-thap.md` rồi làm đúng các thẻ ghi dưới đây" · tham số chung: phiên cần lấy, **phiên quốc tế cần lấy** (mục dưới), ngày lần chạy trước, danh sách mã, `<W>`, đường dẫn `<W>/du-an/data/TOM-TAT.md`.
+
+**Phiên quốc tế cần lấy (phiên chính tính và ghi rõ ngày trong lời giao việc của B, A-chung, A5):**
+- **Mỹ:** phiên Mỹ gần nhất ĐÃ ĐÓNG CỬA trước giờ chạy, theo ngày ET. Mỹ đóng cửa 16:00 ET = 04:00 giờ VN (03:00 khi Mỹ theo giờ mùa hè). Bản tin sáng thứ 3–6 chạy sau 04:00 nên luôn là **phiên Mỹ của ngày hôm trước** (ví dụ sáng thứ 3 24/11 → phiên thứ 2 23/11 ET), KHÔNG phải phiên Mỹ trước phiên Việt Nam cần lấy. Mỹ nghỉ lễ ngày đó thì lùi về phiên trước và ghi "Mỹ nghỉ dd/mm".
+- **Châu Á (Nikkei, Hang Seng, Shanghai, Kospi):** phiên cùng ngày với phiên Việt Nam mới nhất cần lấy (đóng cửa trước phiên Việt Nam).
+- Ghi dạng: `phiên Mỹ cần lấy: <thứ> dd/mm/yyyy (ET) · phiên châu Á cần lấy: dd/mm/yyyy`.
 - **T:** mục "Thẻ T"; thêm chế độ (B/A), `<S>`.
 - **B (bản tin sáng):** mục "Thẻ B2" rồi mục "Agent theo mã" (chế độ B) cho từng mã; thêm Brent và % từ VND, sự kiện F1/F2 trong lịch 24 giờ qua, giá đóng cửa và nhãn VND của từng mã, câu "VND hoạt động (health ok)".
 - **A-chung (phân tích sâu):** lần lượt mục "Thẻ A2", "Thẻ A3" và (chỉ bản đầy đủ) "Thẻ A4"; thêm mức chạy.
@@ -117,7 +122,7 @@ Mục tiêu: **một màn hình điện thoại** (thân bản tin tối đa kho
 3. Agent T xong: `C gia --phien <phiên gần nhất đã đóng cửa> --cong-cu "<tên các công cụ mcp__VND__ đã nạp>"`. Mã thoát 2 → bù phiên thiếu hoặc DỪNG theo mục "Khi DỪNG".
 4. Đọc từ đĩa: `<W>/du-an/data/TOM-TAT.md` và `<W>/du-an/data/MOC-THEO-DOI.md`. Không đọc các CSV: xử lý bằng Python, chỉ in vài dòng.
 5. Gọi **agent B** (agent thu thập duy nhất, làm cả tin chung lẫn từng mã; lời giao việc ở mục "Giao việc"). Agent B ghi `ket_qua_B2.md`, `tham_chieu_B2.csv` và `ma/<MÃ>.md` của từng mã. Tin "T1" lấy từ mục "Tin doanh nghiệp", "Sự kiện công bố", "Hệ sinh thái" của `<W>/ma/<MÃ>.md`.
-6. Gắn nhãn và ghi nhật ký số liệu (mục "Gắn nhãn, A5 và ghi nhật ký số liệu"); chỉ khi còn số quan trọng chưa ✔ mới gọi A5 (tối đa 10 dòng), không thì ghi nhật ký BỎ QUA.
+6. Gắn nhãn và ghi nhật ký số liệu (mục "Gắn nhãn, A5 và ghi nhật ký số liệu"). **Gọi A5 khi còn bất kỳ số quan trọng nào ◐ hoặc ⊘** (số quan trọng ở `nguyen-tac.md`, gồm số Mỹ/châu Á, DXY, lợi suất, VIX, tỷ giá, OMO, tự doanh — không chỉ giá, chỉ số, khối ngoại VND). Đưa mục ⊘ vào `can_kiem_chung.md` (ghi "⊘" và lý do agent B nêu) để A5 tìm nguồn thay thế; tối đa 10 dòng, ưu tiên: (1) S&P 500, Nasdaq, Dow, lợi suất Mỹ 10 năm; (2) tỷ giá trung tâm, giá USD Vietcombank; (3) DXY, VIX; (4) tự doanh, OMO, liên ngân hàng; (5) châu Á; (6) số ◐. Chỉ BỎ QUA khi không còn mục ◐/⊘ nào trong số quan trọng. Agent B ghi ⊘ với lý do "chưa mở/chưa tìm trong lượt này" thì coi là agent B chưa làm xong: ghi nhật ký bước 09 CẢNH BÁO và đưa mục đó lên đầu danh sách A5.
 7. `C tinh [--nghi yyyy-mm-dd …]`: điểm áp lực khối ngoại, chuỗi truyền dẫn, dự báo 6 phiên và biểu đồ các mã có biểu đồ, giá so với TB20 của các mã còn lại (`<W>/tb20.txt`), và **dự báo xác suất** của mọi mã (`<W>/du_bao_xs.txt`, xem mục "Dự báo xác suất"). Không chạy `cycles.py`.
 8. Viết **thân bản tin** theo mẫu vào `<W>/ban_tin.md`, phần đầu ghi chú vào `<W>/ghi_chu_dau.md`, và các mục tự viết của phụ lục vào `<W>/phu_luc_tu_viet.md` dưới đúng tiêu đề mẫu: luôn có `## Chưa kiểm chứng`, `## Đã thu thập nhưng không dùng`, `## Tin nền tảng mới`, `## Lịch sự kiện 10 ngày tới` (lấy từ `MOC-THEO-DOI.md` cộng sự kiện mới của agent B), và `## Từng mã – đầy đủ` (mỗi mã: giá, %, KL so với TB20, vùng 80% phiên 6, chu kỳ theo `MOC-THEO-DOI.md`, mốc, tin T1). Rồi `C ghep`. Lệnh in dòng "Nhật ký: …" thì thêm dòng đó vào dòng "Dữ liệu" của `ban_tin.md` và chạy lại `C ghep`.
 9. `C luu`, rồi `project_write` (với `local_path`) **đúng từng dòng** danh sách nó in ra, không thêm không bớt; ghi nhật ký bước 30; trả lời (bước 31).
