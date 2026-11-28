@@ -37,7 +37,7 @@ Số quan trọng: giá đóng cửa các mã, VN-Index/VN30, thanh khoản, kh�
 - ✔ **đã kiểm chứng:** một nguồn cấp 1, hoặc hai nguồn độc lập (không cùng chép một bài, không cùng nhà cung cấp dữ liệu) cho cùng con số của cùng ngày, khớp theo "Quy tắc chính xác".
 - ◐ **một nguồn:** chỉ một nguồn cấp 2/3. Không dùng làm mốc chấm kịch bản hay dòng giá chính thức.
 - ✖ **mâu thuẫn:** các nguồn ghi khác nhau. Ghi cả hai số và nguồn, không chọn một số để tính.
-- ⊘ **không lấy được:** nêu lý do (trang bị chặn, chưa có bài, sai năm). Không bỏ dòng.
+- ⊘ **không lấy được:** nêu lý do đã tìm (trang bị chặn, chưa có bài đúng phiên sau ≥ 2 truy vấn, sai năm, nguồn chưa cập nhật). "Chưa mở / chưa tìm trong lượt này" không phải lý do ⊘ mà là việc chưa làm. Không bỏ dòng.
 
 Thân bản tin và phần kết luận của báo cáo chỉ dùng số ✔; số ◐ chỉ nhắc kèm "chưa xác nhận"; số ✖ chỉ ghi "các nguồn mâu thuẫn"; con số cụ thể của ◐/✖ kèm nguồn nằm ở phụ lục hoặc mục "Chưa kiểm chứng".
 

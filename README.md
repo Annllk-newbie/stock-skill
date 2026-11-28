@@ -61,7 +61,7 @@ Hướng dẫn: `nguyen-tac.md` + `thu-thap.md` (mục "Agent nào làm thẻ n�
 - **09 Agent B** (B; agent thu thập duy nhất của bản tin) – làm thẻ B2 (dòng tiền Việt Nam, tin chung, quốc tế đêm qua, lịch 3 phiên, doanh nghiệp tham chiếu → `ket_qua_B2.md`, `tham_chieu_B2.csv`) rồi phần theo mã cho mọi mã (→ `<W>/ma/<MÃ>.md`, `<W>/ma/su_kien_<MÃ>.csv`, `danh_muc_M.md`, `nguon_M.md`).
 - **11 Agent A-chung** (A) – lần lượt thẻ A2 (lịch 10 ngày, sự kiện quá khứ chung, tham chiếu → `ket_qua_A2.md`, `su_kien_A2.csv`, `tham_chieu_A2.csv`), A3 (tự doanh, ngành, vĩ mô, quốc tế, Fed, ETF, khu vực → `ket_qua_A3.md`, `su_kien_A3.csv`), A4 (chỉ bản đầy đủ: NHNN, trái phiếu, đầu tư công và FDI → `ket_qua_A4.md`).
 - **14 Agent A-ma** (A; song song với 11) – phần theo mã cho mọi mã, tự gọi VND phần theo mã (→ `<W>/ma/<MÃ>.md`, `<W>/ma/su_kien_<MÃ>.csv`, `danh_muc_M-<MÃ>.md`, `nguon_M-<MÃ>.md`).
-- **18 Agent A5** – đọc `<W>/can_kiem_chung.md`, tìm nguồn thứ hai, ghi `<W>/kiem_chung.md`. A: luôn chạy; B: chỉ khi còn số chưa ✔, không thì BỎ QUA.
+- **18 Agent A5** – đọc `<W>/can_kiem_chung.md`, tìm nguồn thứ hai, ghi `<W>/kiem_chung.md`. A: luôn chạy; B: khi còn số quan trọng ◐ hoặc ⊘ (gồm số Mỹ/châu Á, tỷ giá, tự doanh; mục ⊘ được tìm lại bằng nguồn khác), không còn thì BỎ QUA.
 - **19 Gắn nhãn và ghi nhật ký CSV** – phiên chính, Python. Thêm dòng vào `<W>/du-an/data/kiem-chung.csv`, `von-ngoai.csv`, `tham-chieu.csv`, `<W>/du-an/su-kien-nen-tang.csv` (A thêm `<W>/du-an/<MÃ>/su-kien.csv`).
 
 ### Tính toán

@@ -60,7 +60,7 @@ KE_HOACH = [
     ("09 Agent B", "B", "MỘT agent Haiku: nguyen-tac.md + thu-thap.md (Thẻ B2 rồi Agent theo mã cho mọi mã); ghi nhật ký"),
     ("11 Agent A-chung", "A", "agent Haiku: nguyen-tac.md + thu-thap.md (Thẻ A2, A3, A4 – A4 chỉ bản đầy đủ); song song với 14"),
     ("14 Agent A-ma", "A", "MỘT agent Haiku: nguyen-tac.md + thu-thap.md (Agent theo mã, chế độ A, cho mọi mã); ghi nhật ký"),
-    ("18 Agent A5", "BA", "phiên chính gắn nhãn, gom số chưa ✔ vào can_kiem_chung.md; agent Haiku: nguyen-tac.md + thu-thap.md (Thẻ A5). A: luôn; B: chỉ khi còn số chưa ✔ (không thì BỎ QUA)"),
+    ("18 Agent A5", "BA", "phiên chính gắn nhãn, gom số chưa ✔ vào can_kiem_chung.md; agent Haiku: nguyen-tac.md + thu-thap.md (Thẻ A5). A: luôn; B: khi còn số quan trọng ◐ hoặc ⊘, gồm số quốc tế và tỷ giá (không còn thì BỎ QUA)"),
     ("19 Gắn nhãn và ghi nhật ký CSV", "BA", "phiên chính, Python (phien-chinh.md, mục bước 18–19); ghi nhật ký"),
     ("20–25a Tính toán", "BA", "`chay.py <chế độ> tinh` (kể cả du_bao_xs.py; --nghi nếu có)"),
     ("25 Agent tổng hợp", "A", "agent Sonnet: nguyen-tac.md + tong-hop.md → <W>/bao_cao.md"),
